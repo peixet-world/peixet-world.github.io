@@ -2,10 +2,10 @@
   "site": {
     "title": "PDF Library",
     "description": "Personal PDF sharing website",
-    "owner": "username"
+    "owner": "Pollastre Software"
   },
   "github": {
-    "repo": "username/username.github.io",
+    "repo": "pollastre-software/pollastre-software.github.io",
     "branch": "main"
   },
   "features": {
@@ -14,10 +14,10 @@
     "search": true
   },
   "giscus": {
-    "repo": "username/username.github.io",
-    "repoId": "R_kgDOExample123",
+    "repo": "pollastre-software/pollastre-software.github.io",
+    "repoId": "R_kgDOVILoBw",
     "category": "General",
-    "categoryId": "DIC_kwDOExample456",
+    "categoryId": "DIC_kwDOVILoB84DIWFA",
     "mapping": "pathname",
     "strict": "0",
     "reactionsEnabled": "1",
