@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Test Runner</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .test-summary {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .test-result {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            gap: 10px;
+        }
+        
+        .test-result.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-result.failure {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .status {
+            font-size: 1.2em;
+        }
+        
+        .name {
+            font-weight: bold;
+            min-width: 200px;
+        }
+        
+        .message {
+            color: #666;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .run-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        
+        .run-button:hover {
+            background: #0056b3;
+        }
+        
+        .run-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Deployment Test Runner</h1>
+    <p>This page tests the basic functionality of the PDF sharing website after deployment to GitHub Pages.</p>
+    
+    <button id="runTests" class="run-button">Run Deployment Tests</button>
+    
+    <div id="test-results">
+        <div class="loading">Click "Run Deployment Tests" to start testing...</div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #e9ecef; border-radius: 8px;">
+        <h3>What This Tests</h3>
+        <ul>
+            <li><strong>Homepage Load</strong>: Verifies index.html is accessible</li>
+            <li><strong>Directory Load</strong>: Checks directory.html loads properly</li>
+            <li><strong>Viewer Load</strong>: Ensures viewer.html is available</li>
+            <li><strong>Asset Loading</strong>: Tests CSS and JavaScript files load correctly</li>
+            <li><strong>PDF Directory Access</strong>: Verifies PDF folder is accessible</li>
+        </ul>
+        
+        <h3>Expected Results</h3>
+        <p>All tests should pass if the GitHub Pages deployment is configured correctly. If any tests fail, check:</p>
+        <ul>
+            <li>GitHub Pages is enabled in repository settings</li>
+            <li>All files are committed and pushed to the main branch</li>
+            <li>GitHub Actions workflow completed successfully</li>
+            <li>File paths are correct and case-sensitive</li>
+        </ul>
+    </div>
+
+    <script src="deployment-test.js"></script>
+    <script>
+        document.getElementById('runTests').addEventListener('click', async function() {
+            const button = this;
+            const resultsDiv = document.getElementById('test-results');
+            
+            button.disabled = true;
+            button.textContent = 'Running Tests...';
+            resultsDiv.innerHTML = '<div class="loading">Running deployment tests...</div>';
+            
+            try {
+                const tester = new DeploymentTest();
+                await tester.runAllTests();
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="test-result failure">
+                    <span class="status">❌</span>
+                    <span class="name">Test Runner Error</span>
+                    <span class="message">${error.message}</span>
+                </div>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Run Deployment Tests';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Library - Document Viewer</title>
+    <meta name="description" content="View PDF documents in the browser">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/pdf-viewer.css">
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/accessibility.css">
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+</head>
+<body>
+    <header role="banner">
+        <nav role="navigation" aria-label="Main navigation" id="navigation">
+            <div class="logo">
+                <a href="index.html" aria-label="PDF Library - Home">PDF Library</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="directory.html">Browse PDFs</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="pdf-viewer-container" role="main" id="main-content">
+        <div class="pdf-controls" role="toolbar" aria-label="PDF viewer controls">
+            <div class="control-group" role="group" aria-label="Page navigation">
+                <button id="prev-page" class="control-btn" disabled 
+                        aria-label="Go to previous page" 
+                        title="Previous page (Left arrow or Page Up)">
+                    <span aria-hidden="true">‹</span> Previous
+                </button>
+                <span id="page-info" class="page-info" aria-live="polite">Page 1 of 1</span>
+                <button id="next-page" class="control-btn" disabled 
+                        aria-label="Go to next page" 
+                        title="Next page (Right arrow or Page Down)">
+                    Next <span aria-hidden="true">›</span>
+                </button>
+            </div>
+            
+            <div class="control-group" role="group" aria-label="Jump to page">
+                <label for="page-input" class="sr-only">Page number</label>
+                <input type="number" id="page-input" min="1" value="1" 
+                       aria-label="Enter page number" 
+                       title="Enter page number and press Enter or click Go">
+                <button id="go-to-page" class="control-btn" 
+                        aria-label="Go to specified page">Go</button>
+            </div>
+            
+            <div class="zoom-controls control-group" role="group" aria-label="Zoom controls">
+                <button id="zoom-out" class="control-btn" 
+                        aria-label="Zoom out" 
+                        title="Zoom out (Ctrl/Cmd + -)">
+                    <span aria-hidden="true">−</span>
+                </button>
+                <span id="zoom-level" aria-live="polite" aria-label="Current zoom level">100%</span>
+                <button id="zoom-in" class="control-btn" 
+                        aria-label="Zoom in" 
+                        title="Zoom in (Ctrl/Cmd + +)">
+                    <span aria-hidden="true">+</span>
+                </button>
+                <button id="fit-width" class="control-btn" 
+                        aria-label="Fit to width" 
+                        title="Fit PDF to window width">Fit Width</button>
+                <button id="fit-height" class="control-btn" 
+                        aria-label="Fit to height" 
+                        title="Fit PDF to window height">Fit Height</button>
+            </div>
+            
+            <div class="control-group" role="group" aria-label="Document actions">
+                <button id="download-pdf" class="control-btn" 
+                        aria-label="Download PDF file" 
+                        title="Download PDF for offline viewing">
+                    <span aria-hidden="true">⬇</span> Download
+                </button>
+                <button id="back-to-directory" class="control-btn" 
+                        aria-label="Return to document directory" 
+                        title="Go back to PDF directory">
+                    <span aria-hidden="true">←</span> Back to Directory
+                </button>
+            </div>
+        </div>
+
+        <div class="pdf-canvas-container" role="document" aria-label="PDF document viewer">
+            <canvas id="pdf-canvas" 
+                    role="img" 
+                    aria-label="PDF document page"
+                    tabindex="0"></canvas>
+        </div>
+
+        <div id="loading-indicator" class="loading-indicator" style="display: none;" 
+             role="status" aria-live="polite">
+            <p>Loading PDF document...</p>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;" 
+             role="alert" aria-live="assertive">
+            <p>Error loading PDF. Please try again or download the file.</p>
+        </div>
+    </main>
+
+    <section id="comments-section" class="comments-section">
+        <h2>Discussion</h2>
+        <div id="comments-container">
+            <!-- Comments will be loaded here by JavaScript -->
+        </div>
+    </section>
+
+    <footer role="contentinfo" id="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 PDF Library. Built with GitHub Pages.</p>
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="directory.html">Browse PDFs</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/logger.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/debug-panel.js"></script>
+    <script src="js/performance-optimizer.js"></script>
+    <script src="js/accessibility-enhancer.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pdf-manager.js"></script>
+    <script src="js/comment-integration.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Library - Home</title>
+    <meta name="description" content="Personal PDF sharing website - Browse and view PDF documents">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/accessibility.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+</head>
+<body>
+    <header role="banner">
+        <nav role="navigation" aria-label="Main navigation" id="navigation">
+            <div class="logo">
+                <a href="index.html" aria-label="PDF Library - Home">PDF Library</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" aria-current="page">Home</a></li>
+                <li><a href="directory.html">Browse PDFs</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main role="main" id="main-content">
+        <section class="hero" aria-labelledby="hero-title">
+            <h1 id="hero-title">Welcome to PDF Library</h1>
+            <p class="hero-description">Discover and read PDF documents from our collection</p>
+            <div class="hero-actions">
+                <a href="directory.html" class="btn btn-primary" role="button" aria-describedby="hero-description">Browse All PDFs</a>
+            </div>
+        </section>
+
+        <section class="featured-pdfs" aria-labelledby="featured-title">
+            <h2 id="featured-title">Featured Documents</h2>
+            <div id="featured-container" class="pdf-grid" role="region" aria-label="Featured PDF documents">
+                <div class="loading-state" aria-live="polite">
+                    <p>Loading featured documents...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="recent-pdfs" aria-labelledby="recent-title">
+            <h2 id="recent-title">Recently Added</h2>
+            <div id="recent-container" class="pdf-grid" role="region" aria-label="Recently added PDF documents">
+                <div class="loading-state" aria-live="polite">
+                    <p>Loading recent documents...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo" id="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 PDF Library. Built with GitHub Pages.</p>
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="directory.html">Browse PDFs</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/logger.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/debug-panel.js"></script>
+    <script src="js/performance-optimizer.js"></script>
+    <script src="js/accessibility-enhancer.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pdf-manager.js"></script>
+    <script src="js/tag-system.js"></script>
+</body>
+</html>

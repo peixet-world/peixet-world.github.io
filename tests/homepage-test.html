@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage Test - PDF Library</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        .test-results {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+        }
+        .test-pass { color: #28a745; }
+        .test-fail { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <header role="banner">
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="logo">
+                <a href="../index.html" aria-label="PDF Library - Home">PDF Library</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html" aria-current="page">Home</a></li>
+                <li><a href="../directory.html">Browse PDFs</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main role="main">
+        <section class="hero" aria-labelledby="hero-title">
+            <h1 id="hero-title">Homepage Test</h1>
+            <p class="hero-description">Testing homepage JavaScript functionality</p>
+        </section>
+
+        <div class="test-results">
+            <h2>Test Results</h2>
+            <div id="test-output"></div>
+        </div>
+
+        <section class="featured-pdfs" aria-labelledby="featured-title">
+            <h2 id="featured-title">Featured Documents</h2>
+            <div id="featured-container" class="pdf-grid" role="region" aria-label="Featured PDF documents">
+                <div class="loading-state" aria-live="polite">
+                    <p>Loading featured documents...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="recent-pdfs" aria-labelledby="recent-title">
+            <h2 id="recent-title">Recently Added</h2>
+            <div id="recent-container" class="pdf-grid" role="region" aria-label="Recently added PDF documents">
+                <div class="loading-state" aria-live="polite">
+                    <p>Loading recent documents...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <p>&copy; 2025 PDF Library. Built with GitHub Pages.</p>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/pdf-manager.js"></script>
+    <script>
+        // Test runner
+        async function runTests() {
+            const output = document.getElementById('test-output');
+            const tests = [];
+            
+            // Test 1: Check if PDFManager class exists
+            tests.push({
+                name: 'PDFManager class exists',
+                result: typeof PDFManager === 'function',
+                expected: true
+            });
+            
+            // Test 2: Check if Logger exists
+            tests.push({
+                name: 'Logger utility exists',
+                result: typeof Logger === 'object' && typeof Logger.info === 'function',
+                expected: true
+            });
+            
+            // Test 3: Check if DOM utility exists
+            tests.push({
+                name: 'DOM utility exists',
+                result: typeof DOM === 'object' && typeof DOM.createElement === 'function',
+                expected: true
+            });
+            
+            // Test 4: Test PDFManager initialization
+            try {
+                const pdfManager = new PDFManager('../pdfs/');
+                tests.push({
+                    name: 'PDFManager can be instantiated',
+                    result: pdfManager instanceof PDFManager,
+                    expected: true
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'PDFManager can be instantiated',
+                    result: false,
+                    expected: true,
+                    error: error.message
+                });
+            }
+            
+            // Test 5: Test formatFileSize function
+            try {
+                const size = formatFileSize(1024);
+                tests.push({
+                    name: 'formatFileSize function works',
+                    result: size === '1 KB',
+                    expected: true,
+                    actual: size
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'formatFileSize function works',
+                    result: false,
+                    expected: true,
+                    error: error.message
+                });
+            }
+            
+            // Test 6: Test createPDFCard function
+            try {
+                const samplePDF = {
+                    filename: 'test',
+                    title: 'Test PDF',
+                    description: 'Test description',
+                    tags: ['test'],
+                    uploadDate: '2025-01-22T10:00:00Z',
+                    fileSize: 1024,
+                    pageCount: 5
+                };
+                const card = createPDFCard(samplePDF);
+                tests.push({
+                    name: 'createPDFCard function works',
+                    result: card instanceof HTMLElement && card.classList.contains('pdf-card'),
+                    expected: true
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'createPDFCard function works',
+                    result: false,
+                    expected: true,
+                    error: error.message
+                });
+            }
+            
+            // Display results
+            output.innerHTML = tests.map(test => {
+                const status = test.result === test.expected ? 'PASS' : 'FAIL';
+                const className = test.result === test.expected ? 'test-pass' : 'test-fail';
+                let details = '';
+                
+                if (test.error) {
+                    details = `<br><small>Error: ${test.error}</small>`;
+                } else if (test.actual !== undefined) {
+                    details = `<br><small>Actual: ${test.actual}</small>`;
+                }
+                
+                return `<div class="${className}">
+                    <strong>${status}:</strong> ${test.name}${details}
+                </div>`;
+            }).join('');
+            
+            // Try to run homepage initialization
+            try {
+                console.log('Testing homepage initialization...');
+                await initHomepage();
+                output.innerHTML += '<div class="test-pass"><strong>PASS:</strong> Homepage initialization completed</div>';
+            } catch (error) {
+                output.innerHTML += `<div class="test-fail"><strong>FAIL:</strong> Homepage initialization failed<br><small>Error: ${error.message}</small></div>`;
+            }
+        }
+        
+        // Run tests when page loads
+        DOM.ready(runTests);
+    </script>
+</body>
+</html>

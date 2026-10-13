@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive End-to-End Test Runner</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            margin: 0;
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .test-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .test-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .test-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .test-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-icon {
+            font-size: 1.5em;
+        }
+        
+        .test-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75em;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #d63031;
+        }
+        
+        .status-running {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-passed {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+        }
+        
+        .status-failed {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .test-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .test-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .metric-label {
+            font-size: 0.8em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .test-output {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+        }
+        
+        .test-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e17055, #d63031);
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .controls h2 {
+            margin: 0 0 20px 0;
+            color: #333;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .progress-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 12px;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .error-details {
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .success-message {
+            background: rgba(39, 174, 96, 0.1);
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .test-category {
+            margin-bottom: 30px;
+        }
+        
+        .category-header {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: 0;
+        }
+        
+        .category-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .responsive-test {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .responsive-test {
+                display: block;
+                background: rgba(52, 152, 219, 0.1);
+                border-left: 4px solid #3498db;
+                padding: 15px;
+                margin: 15px 0;
+                border-radius: 0 8px 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Comprehensive E2E Test Suite</h1>
+        <p>End-to-End Testing: User Workflows • Responsive Design • Cross-Browser • Accessibility</p>
+        <div class="responsive-test">
+            <strong>📱 Mobile View Detected:</strong> Testing responsive design functionality
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <h2>Overall Progress</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" id="overall-progress"></div>
+            <div class="progress-text" id="progress-text">Ready to start testing</div>
+        </div>
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-value" id="total-tests">0</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="passed-tests">0</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="failed-tests">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completion-rate">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <h2>Test Controls</h2>
+        <div class="control-group">
+            <button class="btn" onclick="runAllE2ETests()">
+                🚀 Run All E2E Tests
+            </button>
+            <button class="btn btn-secondary" onclick="runQuickSuite()">
+                ⚡ Quick Test Suite
+            </button>
+            <button class="btn btn-success" onclick="generateReport()">
+                📊 Generate Report
+            </button>
+            <button class="btn btn-danger" onclick="clearAllResults()">
+                🗑️ Clear Results
+            </button>
+        </div>
+    </div>
+
+    <div class="test-category">
+        <div class="category-header">
+            <h3 class="category-title">🔄 User Workflow Tests</h3>
+        </div>
+        <div class="test-grid">
+            <div class="test-card">
+                <div class="test-card-header">
+                    <div class="test-title">
+                        <span class="test-icon">🌐</span>
+                        End-to-End Workflows
+                    </div>
+                    <div class="test-status status-pending" id="e2e-status">Pending</div>
+                </div>
+                <div class="test-description">
+                    Tests complete user journeys from homepage → directory → PDF viewer → comments
+                </div>
+                <div class="test-metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="e2e-passed">0</div>
+                        <div class="metric-label">Passed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="e2e-failed">0</div>
+                        <div class="metric-label">Failed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="e2e-duration">0s</div>
+                        <div class="metric-label">Duration</div>
+                    </div>
+                </div>
+                <div class="test-output" id="e2e-output">Click "Run E2E Tests" to execute...</div>
+                <div class="test-actions">
+                    <button class="btn" onclick="runE2ETests()">Run E2E Tests</button>
+                    <button class="btn btn-secondary" onclick="clearTestOutput('e2e')">Clear Output</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <div class="test-card-header">
+                    <div class="test-title">
+                        <span class="test-icon">🎨</span>
+                        Visual Regression
+                    </div>
+                    <div class="test-status status-pending" id="visual-status">Pending</div>
+                </div>
+                <div class="test-description">
+                    Tests responsive design and visual consistency across different screen sizes
+                </div>
+                <div class="test-metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="visual-passed">0</div>
+                        <div class="metric-label">Passed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="visual-failed">0</div>
+                        <div class="metric-label">Failed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="visual-screenshots">0</div>
+                        <div class="metric-label">Screenshots</div>
+                    </div>
+                </div>
+                <div class="test-output" id="visual-output">Click "Run Visual Tests" to execute...</div>
+                <div class="test-actions">
+                    <button class="btn" onclick="runVisualTests()">Run Visual Tests</button>
+                    <button class="btn btn-secondary" onclick="clearTestOutput('visual')">Clear Output</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-category">
+        <div class="category-header">
+            <h3 class="category-title">♿ Accessibility & Compliance Tests</h3>
+        </div>
+        <div class="test-grid">
+            <div class="test-card">
+                <div class="test-card-header">
+                    <div class="test-title">
+                        <span class="test-icon">♿</span>
+                        Accessibility Compliance
+                    </div>
+                    <div class="test-status status-pending" id="accessibility-status">Pending</div>
+                </div>
+                <div class="test-description">
+                    Tests WCAG 2.1 AA compliance, keyboard navigation, and screen reader compatibility
+                </div>
+                <div class="test-metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="accessibility-score">0%</div>
+                        <div class="metric-label">WCAG Score</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="accessibility-violations">0</div>
+                        <div class="metric-label">Violations</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="accessibility-level">AA</div>
+                        <div class="metric-label">Target Level</div>
+                    </div>
+                </div>
+                <div class="test-output" id="accessibility-output">Click "Run Accessibility Tests" to execute...</div>
+                <div class="test-actions">
+                    <button class="btn" onclick="runAccessibilityTests()">Run Accessibility Tests</button>
+                    <button class="btn btn-secondary" onclick="clearTestOutput('accessibility')">Clear Output</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <div class="test-card-header">
+                    <div class="test-title">
+                        <span class="test-icon">⚠️</span>
+                        Error Scenarios
+                    </div>
+                    <div class="test-status status-pending" id="error-status">Pending</div>
+                </div>
+                <div class="test-description">
+                    Tests error handling, network failures, and recovery scenarios
+                </div>
+                <div class="test-metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="error-passed">0</div>
+                        <div class="metric-label">Passed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="error-failed">0</div>
+                        <div class="metric-label">Failed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="error-scenarios">0</div>
+                        <div class="metric-label">Scenarios</div>
+                    </div>
+                </div>
+                <div class="test-output" id="error-output">Click "Run Error Tests" to execute...</div>
+                <div class="test-actions">
+                    <button class="btn" onclick="runErrorScenarioTests()">Run Error Tests</button>
+                    <button class="btn btn-secondary" onclick="clearTestOutput('error')">Clear Output</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="../js/logger.js"></script>
+    <script src="../js/error-handler.js"></script>
+    <script src="../js/pdf-manager.js"></script>
+    <script src="../js/tag-system.js"></script>
+    <script src="../js/main.js"></script>
+    
+    <!-- Load test files -->
+    <script src="end-to-end.test.js"></script>
+    <script src="visual-regression.test.js"></script>
+    <script src="accessibility.test.js"></script>
+    <script src="error-scenarios.test.js"></script>
+
+    <script>
+        let testResults = {
+            e2e: null,
+            visual: null,
+            accessibility: null,
+            errorScenarios: null
+        };
+
+        let totalTests = 0;
+        let completedTests = 0;
+        let startTime = null;
+
+        function updateOverallProgress() {
+            const progress = totalTests > 0 ? (completedTests / totalTests) * 100 : 0;
+            document.getElementById('overall-progress').style.width = progress + '%';
+            
+            const progressText = document.getElementById('progress-text');
+            if (completedTests === 0) {
+                progressText.textContent = 'Ready to start testing';
+            } else if (completedTests < totalTests) {
+                progressText.textContent = `Running tests... ${completedTests}/${totalTests} completed`;
+            } else {
+                const duration = startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 0;
+                progressText.textContent = `All tests completed in ${duration}s`;
+            }
+            
+            updateSummaryStats();
+        }
+
+        function updateSummaryStats() {
+            const totalPassed = Object.values(testResults).reduce((sum, result) => 
+                sum + (result ? result.passed : 0), 0
+            );
+            const totalFailed = Object.values(testResults).reduce((sum, result) => 
+                sum + (result ? result.failed : 0), 0
+            );
+            const totalCount = totalPassed + totalFailed;
+            const successRate = totalCount > 0 ? ((totalPassed / totalCount) * 100).toFixed(1) : 0;
+            
+            document.getElementById('total-tests').textContent = totalCount;
+            document.getElementById('passed-tests').textContent = totalPassed;
+            document.getElementById('failed-tests').textContent = totalFailed;
+            document.getElementById('completion-rate').textContent = successRate + '%';
+        }
+
+        function setTestStatus(testName, status) {
+            const statusElement = document.getElementById(`${testName}-status`);
+            statusElement.className = `test-status status-${status}`;
+            statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function appendTestOutput(testName, output) {
+            const outputElement = document.getElementById(`${testName}-output`);
+            outputElement.textContent += output + '\n';
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+
+        function clearTestOutput(testName) {
+            const outputElement = document.getElementById(`${testName}-output`);
+            outputElement.textContent = '';
+        }
+
+        function updateTestMetrics(testName, metrics) {
+            Object.keys(metrics).forEach(key => {
+                const element = document.getElementById(`${testName}-${key}`);
+                if (element) {
+                    element.textContent = metrics[key];
+                }
+            });
+        }
+
+        async function runE2ETests() {
+            setTestStatus('e2e', 'running');
+            clearTestOutput('e2e');
+            const testStartTime = Date.now();
+            
+            try {
+                appendTestOutput('e2e', 'Starting End-to-End tests...\n');
+                
+                const originalLog = console.log;
+                console.log = (msg) => {
+                    appendTestOutput('e2e', msg);
+                    originalLog(msg);
+                };
+                
+                const e2eTests = new EndToEndTests();
+                await e2eTests.runAllTests();
+                
+                testResults.e2e = {
+                    passed: e2eTests.passed,
+                    failed: e2eTests.failed
+                };
+                
+                console.log = originalLog;
+                
+                const duration = ((Date.now() - testStartTime) / 1000).toFixed(1);
+                updateTestMetrics('e2e', {
+                    passed: testResults.e2e.passed,
+                    failed: testResults.e2e.failed,
+                    duration: duration + 's'
+                });
+                
+                if (testResults.e2e.failed === 0) {
+                    setTestStatus('e2e', 'passed');
+                    appendTestOutput('e2e', '\n✅ All End-to-End tests passed!');
+                } else {
+                    setTestStatus('e2e', 'failed');
+                    appendTestOutput('e2e', `\n❌ ${testResults.e2e.failed} End-to-End test(s) failed`);
+                }
+                
+            } catch (error) {
+                setTestStatus('e2e', 'failed');
+                appendTestOutput('e2e', `\n❌ End-to-End test suite failed: ${error.message}`);
+                testResults.e2e = { passed: 0, failed: 1 };
+            }
+            
+            completedTests++;
+            updateOverallProgress();
+        }
+
+        async function runVisualTests() {
+            setTestStatus('visual', 'running');
+            clearTestOutput('visual');
+            
+            try {
+                appendTestOutput('visual', 'Starting Visual Regression tests...\n');
+                
+                const originalLog = console.log;
+                console.log = (msg) => {
+                    appendTestOutput('visual', msg);
+                    originalLog(msg);
+                };
+                
+                const visualTests = new VisualRegressionTests();
+                await visualTests.runAllTests();
+                
+                testResults.visual = {
+                    passed: visualTests.passed,
+                    failed: visualTests.failed
+                };
+                
+                console.log = originalLog;
+                
+                updateTestMetrics('visual', {
+                    passed: testResults.visual.passed,
+                    failed: testResults.visual.failed,
+                    screenshots: visualTests.screenshots.length
+                });
+                
+                if (testResults.visual.failed === 0) {
+                    setTestStatus('visual', 'passed');
+                    appendTestOutput('visual', '\n✅ All Visual Regression tests passed!');
+                } else {
+                    setTestStatus('visual', 'failed');
+                    appendTestOutput('visual', `\n❌ ${testResults.visual.failed} Visual Regression test(s) failed`);
+                }
+                
+            } catch (error) {
+                setTestStatus('visual', 'failed');
+                appendTestOutput('visual', `\n❌ Visual Regression test suite failed: ${error.message}`);
+                testResults.visual = { passed: 0, failed: 1 };
+            }
+            
+            completedTests++;
+            updateOverallProgress();
+        }
+
+        async function runAccessibilityTests() {
+            setTestStatus('accessibility', 'running');
+            clearTestOutput('accessibility');
+            
+            try {
+                appendTestOutput('accessibility', 'Starting Accessibility tests...\n');
+                
+                const originalLog = console.log;
+                console.log = (msg) => {
+                    appendTestOutput('accessibility', msg);
+                    originalLog(msg);
+                };
+                
+                const accessibilityTests = new AccessibilityTests();
+                await accessibilityTests.runAllTests();
+                
+                testResults.accessibility = {
+                    passed: accessibilityTests.passed,
+                    failed: accessibilityTests.failed,
+                    violations: accessibilityTests.violations.length
+                };
+                
+                console.log = originalLog;
+                
+                const score = testResults.accessibility.passed / 
+                             (testResults.accessibility.passed + testResults.accessibility.failed) * 100;
+                
+                updateTestMetrics('accessibility', {
+                    score: score.toFixed(1) + '%',
+                    violations: testResults.accessibility.violations,
+                    level: 'AA'
+                });
+                
+                if (testResults.accessibility.failed === 0) {
+                    setTestStatus('accessibility', 'passed');
+                    appendTestOutput('accessibility', '\n✅ All Accessibility tests passed!');
+                } else {
+                    setTestStatus('accessibility', 'failed');
+                    appendTestOutput('accessibility', `\n❌ ${testResults.accessibility.failed} Accessibility test(s) failed`);
+                }
+                
+            } catch (error) {
+                setTestStatus('accessibility', 'failed');
+                appendTestOutput('accessibility', `\n❌ Accessibility test suite failed: ${error.message}`);
+                testResults.accessibility = { passed: 0, failed: 1, violations: 1 };
+            }
+            
+            completedTests++;
+            updateOverallProgress();
+        }
+
+        async function runErrorScenarioTests() {
+            setTestStatus('error', 'running');
+            clearTestOutput('error');
+            
+            try {
+                appendTestOutput('error', 'Starting Error Scenario tests...\n');
+                
+                const originalLog = console.log;
+                console.log = (msg) => {
+                    appendTestOutput('error', msg);
+                    originalLog(msg);
+                };
+                
+                const errorTests = new ErrorScenarioTests();
+                await errorTests.runAllTests();
+                
+                testResults.errorScenarios = {
+                    passed: errorTests.passed,
+                    failed: errorTests.failed
+                };
+                
+                console.log = originalLog;
+                
+                updateTestMetrics('error', {
+                    passed: testResults.errorScenarios.passed,
+                    failed: testResults.errorScenarios.failed,
+                    scenarios: testResults.errorScenarios.passed + testResults.errorScenarios.failed
+                });
+                
+                if (testResults.errorScenarios.failed === 0) {
+                    setTestStatus('error', 'passed');
+                    appendTestOutput('error', '\n✅ All Error Scenario tests passed!');
+                } else {
+                    setTestStatus('error', 'failed');
+                    appendTestOutput('error', `\n❌ ${testResults.errorScenarios.failed} Error Scenario test(s) failed`);
+                }
+                
+            } catch (error) {
+                setTestStatus('error', 'failed');
+                appendTestOutput('error', `\n❌ Error Scenario test suite failed: ${error.message}`);
+                testResults.errorScenarios = { passed: 0, failed: 1 };
+            }
+            
+            completedTests++;
+            updateOverallProgress();
+        }
+
+        async function runAllE2ETests() {
+            startTime = Date.now();
+            totalTests = 4;
+            completedTests = 0;
+            updateOverallProgress();
+            
+            testResults = {
+                e2e: null,
+                visual: null,
+                accessibility: null,
+                errorScenarios: null
+            };
+            
+            await runE2ETests();
+            await runVisualTests();
+            await runAccessibilityTests();
+            await runErrorScenarioTests();
+            
+            showFinalSummary();
+        }
+
+        async function runQuickSuite() {
+            startTime = Date.now();
+            totalTests = 2;
+            completedTests = 0;
+            updateOverallProgress();
+            
+            await runE2ETests();
+            await runAccessibilityTests();
+            
+            showFinalSummary();
+        }
+
+        function showFinalSummary() {
+            const totalPassed = Object.values(testResults).reduce((sum, result) => 
+                sum + (result ? result.passed : 0), 0
+            );
+            const totalFailed = Object.values(testResults).reduce((sum, result) => 
+                sum + (result ? result.failed : 0), 0
+            );
+            const duration = startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 0;
+            
+            console.log(`\n🎯 FINAL E2E RESULTS: ${totalPassed} passed, ${totalFailed} failed in ${duration}s`);
+            
+            if (totalFailed === 0) {
+                console.log('🎉 All end-to-end tests passed successfully!');
+            } else {
+                console.log(`⚠️  ${totalFailed} test(s) need attention`);
+            }
+        }
+
+        function generateReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                testSuite: 'End-to-End Testing',
+                results: testResults,
+                summary: {
+                    totalPassed: Object.values(testResults).reduce((sum, result) => 
+                        sum + (result ? result.passed : 0), 0
+                    ),
+                    totalFailed: Object.values(testResults).reduce((sum, result) => 
+                        sum + (result ? result.failed : 0), 0
+                    ),
+                    duration: startTime ? ((Date.now() - startTime) / 1000).toFixed(1) : 0
+                }
+            };
+            
+            const reportWindow = window.open('', '_blank');
+            reportWindow.document.write(`
+                <html>
+                <head><title>E2E Test Report</title></head>
+                <body style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h1>End-to-End Test Report</h1>
+                    <p><strong>Generated:</strong> ${report.timestamp}</p>
+                    <h2>Summary</h2>
+                    <p>Total Passed: ${report.summary.totalPassed}</p>
+                    <p>Total Failed: ${report.summary.totalFailed}</p>
+                    <p>Duration: ${report.summary.duration}s</p>
+                    <h2>Detailed Results</h2>
+                    <pre>${JSON.stringify(report.results, null, 2)}</pre>
+                </body>
+                </html>
+            `);
+        }
+
+        function clearAllResults() {
+            ['e2e', 'visual', 'accessibility', 'error'].forEach(testName => {
+                setTestStatus(testName, 'pending');
+                clearTestOutput(testName);
+                document.getElementById(`${testName}-output`).textContent = 
+                    `Click "Run ${testName.charAt(0).toUpperCase() + testName.slice(1)} Tests" to execute...`;
+            });
+            
+            // Reset metrics
+            updateTestMetrics('e2e', { passed: 0, failed: 0, duration: '0s' });
+            updateTestMetrics('visual', { passed: 0, failed: 0, screenshots: 0 });
+            updateTestMetrics('accessibility', { score: '0%', violations: 0, level: 'AA' });
+            updateTestMetrics('error', { passed: 0, failed: 0, scenarios: 0 });
+            
+            totalTests = 0;
+            completedTests = 0;
+            startTime = null;
+            updateOverallProgress();
+            
+            testResults = {
+                e2e: null,
+                visual: null,
+                accessibility: null,
+                errorScenarios: null
+            };
+        }
+
+        // Initialize
+        updateOverallProgress();
+    </script>
+</body>
+</html>

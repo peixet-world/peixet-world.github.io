@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-01-22T10:00:00Z",
+  "description": "Manifest file listing all available PDF files in the repository",
+  "totalFiles": 4,
+  "totalSize": 15728640,
+  "categories": ["Documentation", "Technical", "Guides"],
+  "files": [
+    {
+      "filename": "sample-document.pdf",
+      "fileSize": 329,
+      "uploadDate": "2025-01-22T10:00:00Z",
+      "hasMetadata": true
+    },
+    {
+      "filename": "sample-guide.pdf",
+      "fileSize": 2048576,
+      "uploadDate": "2025-01-15T10:30:00Z",
+      "hasMetadata": true,
+      "featured": true
+    },
+    {
+      "filename": "technical-reference.pdf",
+      "fileSize": 8388608,
+      "uploadDate": "2025-01-10T14:20:00Z",
+      "hasMetadata": true,
+      "category": "Technical"
+    },
+    {
+      "filename": "user-manual.pdf",
+      "fileSize": 5291456,
+      "uploadDate": "2025-01-12T09:15:00Z",
+      "hasMetadata": true,
+      "featured": true,
+      "category": "Documentation"
+    }
+  ],
+  "statistics": {
+    "featuredCount": 2,
+    "withMetadata": 4,
+    "averageFileSize": 3932160,
+    "lastAdded": "2025-01-22T10:00:00Z"
+  }
+}

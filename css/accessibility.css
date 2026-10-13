@@ -1,0 +1,564 @@
+/* Accessibility enhancement styles */
+
+/* Skip links */
+.skip-links {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    z-index: 1000;
+}
+
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000;
+    color: #fff;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: top 0.3s;
+    z-index: 1001;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Focus indicators */
+*:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Enhanced focus for interactive elements */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus,
+[role="button"]:focus,
+[tabindex]:focus {
+    outline: 3px solid #3498db;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 4px #3498db;
+}
+
+/* Focus visible for keyboard navigation */
+.focus-visible {
+    outline: 3px solid #3498db !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 4px #3498db !important;
+}
+
+/* Remove focus outline for mouse users */
+.js-focus-visible *:focus:not(.focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    * {
+        border-color: CanvasText !important;
+    }
+    
+    .btn {
+        border: 2px solid CanvasText !important;
+        background: Canvas !important;
+        color: CanvasText !important;
+    }
+    
+    .btn:hover,
+    .btn:focus {
+        background: Highlight !important;
+        color: HighlightText !important;
+        border-color: Highlight !important;
+    }
+    
+    .pdf-card {
+        border: 2px solid CanvasText !important;
+        background: Canvas !important;
+        color: CanvasText !important;
+    }
+    
+    .tag {
+        border: 1px solid CanvasText !important;
+        background: Canvas !important;
+        color: CanvasText !important;
+    }
+    
+    .tag:hover,
+    .tag:focus,
+    .tag.active {
+        background: Highlight !important;
+        color: HighlightText !important;
+        border-color: Highlight !important;
+    }
+    
+    .loading-indicator {
+        border: 2px solid CanvasText !important;
+        background: Canvas !important;
+        color: CanvasText !important;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .pdf-card {
+        transform: none !important;
+    }
+    
+    .btn {
+        transform: none !important;
+    }
+    
+    .tag {
+        transform: none !important;
+    }
+}
+
+/* Large text support */
+@media (min-resolution: 2dppx) {
+    body {
+        font-size: 18px;
+        line-height: 1.7;
+    }
+    
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .pdf-card {
+        padding: 2rem;
+    }
+    
+    .tag {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* Color blindness support */
+.colorblind-friendly {
+    /* Use patterns and shapes in addition to color */
+}
+
+.colorblind-friendly .tag.active::before {
+    content: "✓ ";
+    font-weight: bold;
+}
+
+.colorblind-friendly .btn-primary {
+    background-image: linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, transparent 50%);
+}
+
+/* Keyboard navigation indicators */
+.keyboard-navigation .pdf-card:focus {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.keyboard-navigation .tag:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Error states with better accessibility */
+.error-state {
+    border-left: 4px solid #e74c3c;
+    padding-left: 1rem;
+}
+
+.error-state::before {
+    content: "⚠ ";
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+/* Form accessibility enhancements */
+input:required,
+select:required,
+textarea:required {
+    border-left: 3px solid #e74c3c;
+}
+
+input:required:valid,
+select:required:valid,
+textarea:required:valid {
+    border-left-color: #27ae60;
+}
+
+input:invalid,
+select:invalid,
+textarea:invalid {
+    border-color: #e74c3c;
+    background-color: #fdf2f2;
+}
+
+input:invalid:focus,
+select:invalid:focus,
+textarea:invalid:focus {
+    outline-color: #e74c3c;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 4px #e74c3c;
+}
+
+/* Field labels */
+label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+label.required::after {
+    content: " *";
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Loading states accessibility */
+.loading-indicator[aria-live] {
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal accessibility */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal[hidden] {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.modal-close:focus {
+    background: #f0f0f0;
+}
+
+/* Table accessibility */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    text-align: left;
+    font-weight: 600;
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+}
+
+td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+}
+
+/* List accessibility */
+ul, ol {
+    padding-left: 2rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+/* Link accessibility */
+a {
+    color: #3498db;
+    text-decoration: underline;
+}
+
+a:hover,
+a:focus {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #8e44ad;
+}
+
+/* External link indicators */
+a[href^="http"]:not([href*="localhost"]):not([href*="127.0.0.1"])::after {
+    content: " ↗";
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+
+/* PDF link indicators */
+a[href$=".pdf"]::after {
+    content: " (PDF)";
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+
+/* Button accessibility */
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    transform: none;
+}
+
+/* Custom button roles */
+[role="button"] {
+    cursor: pointer;
+    user-select: none;
+}
+
+[role="button"]:hover {
+    opacity: 0.8;
+}
+
+/* Tooltip accessibility */
+[title] {
+    position: relative;
+}
+
+[title]:hover::after,
+[title]:focus::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Progress indicators */
+progress {
+    width: 100%;
+    height: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: #f0f0f0;
+}
+
+progress::-webkit-progress-bar {
+    background: #f0f0f0;
+    border-radius: 0.5rem;
+}
+
+progress::-webkit-progress-value {
+    background: #3498db;
+    border-radius: 0.5rem;
+}
+
+progress::-moz-progress-bar {
+    background: #3498db;
+    border-radius: 0.5rem;
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Responsive text scaling */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .skip-link {
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 18px;
+        line-height: 1.7;
+    }
+    
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .pdf-card {
+        padding: 1.5rem;
+    }
+    
+    .tag {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Print accessibility */
+@media print {
+    .skip-links,
+    .modal,
+    .loading-indicator {
+        display: none !important;
+    }
+    
+    a::after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+    }
+    
+    .pdf-card {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+        border: 1px solid #000;
+    }
+}
+
+/* Windows High Contrast Mode */
+@media screen and (-ms-high-contrast: active) {
+    .btn {
+        border: 2px solid;
+    }
+    
+    .pdf-card {
+        border: 2px solid;
+    }
+    
+    .tag {
+        border: 1px solid;
+    }
+    
+    .loading-indicator {
+        border: 2px solid;
+    }
+}
+
+/* Focus management for dynamic content */
+.dynamic-content-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.dynamic-content-loaded {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Announcement styles */
+#live-region,
+#assertive-live-region {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}

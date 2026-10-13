@@ -1,0 +1,29 @@
+{
+  "site": {
+    "title": "PDF Library",
+    "description": "Personal PDF sharing website",
+    "owner": "username"
+  },
+  "github": {
+    "repo": "username/username.github.io",
+    "branch": "main"
+  },
+  "features": {
+    "comments": true,
+    "thumbnails": true,
+    "search": true
+  },
+  "giscus": {
+    "repo": "username/username.github.io",
+    "repoId": "R_kgDOExample123",
+    "category": "General",
+    "categoryId": "DIC_kwDOExample456",
+    "mapping": "pathname",
+    "strict": "0",
+    "reactionsEnabled": "1",
+    "emitMetadata": "0",
+    "inputPosition": "bottom",
+    "theme": "light",
+    "lang": "en"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Sample Document",
+  "description": "This is a sample PDF document used for testing the PDF sharing website functionality.",
+  "tags": ["sample", "test", "documentation"],
+  "uploadDate": "2025-01-22T10:00:00Z",
+  "fileSize": 329,
+  "pageCount": 1,
+  "author": "PDF Library System",
+  "featured": true
+}

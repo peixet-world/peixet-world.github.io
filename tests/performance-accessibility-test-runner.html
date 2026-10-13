@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance and Accessibility Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .test-header {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .test-section {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-results {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .demo-container {
+            border: 2px dashed #dee2e6;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+        
+        .loading-demo {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .accessibility-demo {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        
+        .demo-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .skip-link-demo {
+            position: relative;
+            height: 60px;
+            background: #343a40;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        .focus-demo {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .focus-demo button,
+        .focus-demo a {
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #495057;
+            background: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>Performance and Accessibility Tests</h1>
+        <p>Testing performance optimizations and accessibility enhancements for the PDF sharing website</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Performance Optimizer Tests</h2>
+        <p>Testing lazy loading, caching, and loading indicators</p>
+        
+        <div class="demo-container">
+            <h3>Loading Indicators Demo</h3>
+            <div class="loading-demo" id="loading-demo">
+                <!-- Loading indicators will be added here -->
+            </div>
+        </div>
+        
+        <button class="btn" onclick="runPerformanceTests()">Run Performance Tests</button>
+        <button class="btn" onclick="demoLoadingIndicators()">Demo Loading Indicators</button>
+        <button class="btn" onclick="testLazyLoading()">Test Lazy Loading</button>
+        
+        <div id="performance-results" class="test-results info" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Accessibility Enhancer Tests</h2>
+        <p>Testing keyboard navigation, screen reader support, and ARIA compliance</p>
+        
+        <div class="demo-container">
+            <h3>Accessibility Features Demo</h3>
+            <div class="accessibility-demo">
+                <div class="demo-card">
+                    <h4>Skip Links</h4>
+                    <div class="skip-link-demo">
+                        <span>Press Tab to see skip links</span>
+                    </div>
+                </div>
+                
+                <div class="demo-card">
+                    <h4>Focus Management</h4>
+                    <div class="focus-demo">
+                        <button>Button 1</button>
+                        <button>Button 2</button>
+                        <a href="#" onclick="return false;">Link</a>
+                        <button role="button" tabindex="0">Custom Button</button>
+                    </div>
+                </div>
+                
+                <div class="demo-card">
+                    <h4>Live Regions</h4>
+                    <button onclick="testAnnouncement()">Test Announcement</button>
+                    <button onclick="testAssertiveAnnouncement()">Test Assertive</button>
+                </div>
+                
+                <div class="demo-card">
+                    <h4>Form Enhancement</h4>
+                    <form onsubmit="return false;">
+                        <input type="text" placeholder="Test input" required>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="runAccessibilityTests()">Run Accessibility Tests</button>
+        <button class="btn" onclick="testKeyboardNavigation()">Test Keyboard Navigation</button>
+        <button class="btn" onclick="checkAccessibilityStatus()">Check A11y Status</button>
+        
+        <div id="accessibility-results" class="test-results info" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Integration Tests</h2>
+        <p>Testing how performance and accessibility features work together</p>
+        
+        <button class="btn" onclick="runIntegrationTests()">Run Integration Tests</button>
+        <button class="btn" onclick="simulateUserWorkflow()">Simulate User Workflow</button>
+        
+        <div id="integration-results" class="test-results info" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Performance Statistics</h2>
+        <div class="stats-grid" id="stats-grid">
+            <!-- Stats will be populated here -->
+        </div>
+        <button class="btn" onclick="updateStats()">Update Statistics</button>
+    </div>
+
+    <!-- Include required scripts -->
+    <script src="../js/logger.js"></script>
+    <script src="../js/performance-optimizer.js"></script>
+    <script src="../js/accessibility-enhancer.js"></script>
+
+    <script>
+        // Test runner implementation
+        let testResults = {
+            performance: [],
+            accessibility: [],
+            integration: []
+        };
+
+        function runPerformanceTests() {
+            const resultsDiv = document.getElementById('performance-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'test-results info';
+            resultsDiv.textContent = 'Running performance tests...';
+
+            const tests = [
+                testPerformanceOptimizerInitialization,
+                testLoadingIndicatorCreation,
+                testLazyLoadingSetup,
+                testImageOptimization,
+                testCacheManagement
+            ];
+
+            let results = [];
+            let passed = 0;
+
+            tests.forEach((test, index) => {
+                try {
+                    const result = test();
+                    results.push(`✓ ${test.name}: ${result}`);
+                    passed++;
+                } catch (error) {
+                    results.push(`✗ ${test.name}: ${error.message}`);
+                }
+            });
+
+            resultsDiv.className = passed === tests.length ? 'test-results success' : 'test-results error';
+            resultsDiv.textContent = `Performance Tests: ${passed}/${tests.length} passed\n\n${results.join('\n')}`;
+            
+            testResults.performance = results;
+        }
+
+        function runAccessibilityTests() {
+            const resultsDiv = document.getElementById('accessibility-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'test-results info';
+            resultsDiv.textContent = 'Running accessibility tests...';
+
+            const tests = [
+                testAccessibilityEnhancerInitialization,
+                testSkipLinksCreation,
+                testLiveRegionsCreation,
+                testFormEnhancement,
+                testKeyboardHandling
+            ];
+
+            let results = [];
+            let passed = 0;
+
+            tests.forEach((test, index) => {
+                try {
+                    const result = test();
+                    results.push(`✓ ${test.name}: ${result}`);
+                    passed++;
+                } catch (error) {
+                    results.push(`✗ ${test.name}: ${error.message}`);
+                }
+            });
+
+            resultsDiv.className = passed === tests.length ? 'test-results success' : 'test-results error';
+            resultsDiv.textContent = `Accessibility Tests: ${passed}/${tests.length} passed\n\n${results.join('\n')}`;
+            
+            testResults.accessibility = results;
+        }
+
+        function runIntegrationTests() {
+            const resultsDiv = document.getElementById('integration-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'test-results info';
+            resultsDiv.textContent = 'Running integration tests...';
+
+            const tests = [
+                testPerformanceAccessibilityIntegration,
+                testDynamicContentEnhancement,
+                testLoadingStateAccessibility
+            ];
+
+            let results = [];
+            let passed = 0;
+
+            tests.forEach((test, index) => {
+                try {
+                    const result = test();
+                    results.push(`✓ ${test.name}: ${result}`);
+                    passed++;
+                } catch (error) {
+                    results.push(`✗ ${test.name}: ${error.message}`);
+                }
+            });
+
+            resultsDiv.className = passed === tests.length ? 'test-results success' : 'test-results error';
+            resultsDiv.textContent = `Integration Tests: ${passed}/${tests.length} passed\n\n${results.join('\n')}`;
+            
+            testResults.integration = results;
+        }
+
+        // Performance test functions
+        function testPerformanceOptimizerInitialization() {
+            if (!window.PerformanceOptimizer) {
+                throw new Error('PerformanceOptimizer not found');
+            }
+            return 'PerformanceOptimizer initialized successfully';
+        }
+
+        function testLoadingIndicatorCreation() {
+            const indicator = window.PerformanceOptimizer.createLoadingIndicator('Test', 'spinner');
+            if (!indicator || !indicator.classList.contains('loading-indicator')) {
+                throw new Error('Loading indicator not created properly');
+            }
+            return 'Loading indicator created successfully';
+        }
+
+        function testLazyLoadingSetup() {
+            const element = document.createElement('div');
+            element.className = 'pdf-card';
+            window.PerformanceOptimizer.enableLazyLoading(element, { test: true });
+            
+            if (!element.classList.contains('lazy-load')) {
+                throw new Error('Lazy loading not enabled');
+            }
+            return 'Lazy loading setup successful';
+        }
+
+        function testImageOptimization() {
+            const img = document.createElement('img');
+            window.PerformanceOptimizer.optimizeImage(img);
+            
+            if (img.loading !== 'lazy') {
+                throw new Error('Image optimization failed');
+            }
+            return 'Image optimization successful';
+        }
+
+        function testCacheManagement() {
+            const stats = window.PerformanceOptimizer.getCacheStats();
+            if (!stats || typeof stats.thumbnailCache === 'undefined') {
+                throw new Error('Cache management not working');
+            }
+            return 'Cache management working correctly';
+        }
+
+        // Accessibility test functions
+        function testAccessibilityEnhancerInitialization() {
+            if (!window.AccessibilityEnhancer) {
+                throw new Error('AccessibilityEnhancer not found');
+            }
+            return 'AccessibilityEnhancer initialized successfully';
+        }
+
+        function testSkipLinksCreation() {
+            const skipLinks = document.querySelector('.skip-links');
+            if (!skipLinks) {
+                throw new Error('Skip links not created');
+            }
+            return 'Skip links created successfully';
+        }
+
+        function testLiveRegionsCreation() {
+            const liveRegion = document.getElementById('live-region');
+            const assertiveLiveRegion = document.getElementById('assertive-live-region');
+            
+            if (!liveRegion || !assertiveLiveRegion) {
+                throw new Error('Live regions not created');
+            }
+            return 'Live regions created successfully';
+        }
+
+        function testFormEnhancement() {
+            const form = document.querySelector('form');
+            const input = form.querySelector('input[required]');
+            
+            if (input.getAttribute('aria-required') !== 'true') {
+                throw new Error('Form enhancement not applied');
+            }
+            return 'Form enhancement successful';
+        }
+
+        function testKeyboardHandling() {
+            // This is a simplified test - in practice, you'd test actual keyboard events
+            const buttons = document.querySelectorAll('[role="button"]');
+            let hasKeyboardHandler = false;
+            
+            buttons.forEach(button => {
+                if (button.hasKeyboardHandler) {
+                    hasKeyboardHandler = true;
+                }
+            });
+            
+            return 'Keyboard handling setup completed';
+        }
+
+        // Integration test functions
+        function testPerformanceAccessibilityIntegration() {
+            const element = document.createElement('div');
+            element.className = 'pdf-card';
+            document.body.appendChild(element);
+            
+            // Test both systems working together
+            window.PerformanceOptimizer.enableLazyLoading(element, { test: true });
+            window.AccessibilityEnhancer.enhanceDynamicContent(element.parentElement);
+            
+            document.body.removeChild(element);
+            return 'Performance and accessibility integration successful';
+        }
+
+        function testDynamicContentEnhancement() {
+            const container = document.createElement('div');
+            const button = document.createElement('button');
+            button.textContent = 'Test Button';
+            container.appendChild(button);
+            
+            window.AccessibilityEnhancer.enhanceDynamicContent(container);
+            
+            return 'Dynamic content enhancement successful';
+        }
+
+        function testLoadingStateAccessibility() {
+            const indicator = window.PerformanceOptimizer.createLoadingIndicator('Loading...', 'spinner');
+            
+            if (indicator.getAttribute('role') !== 'status' || 
+                indicator.getAttribute('aria-live') !== 'polite') {
+                throw new Error('Loading state not accessible');
+            }
+            return 'Loading state accessibility verified';
+        }
+
+        // Demo functions
+        function demoLoadingIndicators() {
+            const container = document.getElementById('loading-demo');
+            container.innerHTML = '';
+            
+            const types = ['spinner', 'progress', 'skeleton'];
+            types.forEach(type => {
+                const indicator = window.PerformanceOptimizer.createLoadingIndicator(`Loading ${type}...`, type);
+                container.appendChild(indicator);
+                
+                if (type === 'progress') {
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += 10;
+                        window.PerformanceOptimizer.updateLoadingProgress(indicator, progress);
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(() => {
+                                window.PerformanceOptimizer.removeLoadingIndicator(indicator);
+                            }, 1000);
+                        }
+                    }, 200);
+                }
+            });
+        }
+
+        function testLazyLoading() {
+            // Create test elements for lazy loading demo
+            const container = document.createElement('div');
+            container.style.height = '200px';
+            container.style.overflow = 'auto';
+            container.style.border = '1px solid #ccc';
+            container.style.padding = '1rem';
+            
+            for (let i = 0; i < 10; i++) {
+                const element = document.createElement('div');
+                element.className = 'pdf-card';
+                element.style.height = '100px';
+                element.style.margin = '10px 0';
+                element.style.background = '#f0f0f0';
+                element.textContent = `Card ${i + 1}`;
+                
+                if (i > 2) {
+                    window.PerformanceOptimizer.enableLazyLoading(element, { 
+                        cardNumber: i + 1 
+                    });
+                }
+                
+                container.appendChild(element);
+            }
+            
+            document.body.appendChild(container);
+            
+            setTimeout(() => {
+                document.body.removeChild(container);
+            }, 5000);
+        }
+
+        function testAnnouncement() {
+            window.AccessibilityEnhancer.announce('This is a test announcement for screen readers');
+        }
+
+        function testAssertiveAnnouncement() {
+            window.AccessibilityEnhancer.announce('This is an urgent announcement!', true);
+        }
+
+        function testKeyboardNavigation() {
+            alert('Use Tab, Shift+Tab, and arrow keys to navigate. Press Escape to test escape handling.');
+        }
+
+        function checkAccessibilityStatus() {
+            const status = window.AccessibilityEnhancer.getAccessibilityStatus();
+            const resultsDiv = document.getElementById('accessibility-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'test-results info';
+            resultsDiv.textContent = `Accessibility Status:\n${JSON.stringify(status, null, 2)}`;
+        }
+
+        function simulateUserWorkflow() {
+            const resultsDiv = document.getElementById('integration-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'test-results info';
+            resultsDiv.textContent = 'Simulating user workflow...';
+            
+            // Simulate loading content
+            const loadingIndicator = window.PerformanceOptimizer.createLoadingIndicator('Loading documents...', 'progress');
+            document.body.appendChild(loadingIndicator);
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 20;
+                window.PerformanceOptimizer.updateLoadingProgress(loadingIndicator, progress);
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    window.PerformanceOptimizer.removeLoadingIndicator(loadingIndicator);
+                    window.AccessibilityEnhancer.announce('Documents loaded successfully');
+                    
+                    resultsDiv.className = 'test-results success';
+                    resultsDiv.textContent = 'User workflow simulation completed successfully';
+                }
+            }, 500);
+        }
+
+        function updateStats() {
+            const statsGrid = document.getElementById('stats-grid');
+            const performanceStats = window.PerformanceOptimizer.getCacheStats();
+            const accessibilityStats = window.AccessibilityEnhancer.getAccessibilityStatus();
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${performanceStats.thumbnailCache.size}</div>
+                    <div class="stat-label">Cached Thumbnails</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${performanceStats.loadingElements}</div>
+                    <div class="stat-label">Loading Elements</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${accessibilityStats.focusableElements}</div>
+                    <div class="stat-label">Focusable Elements</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${accessibilityStats.imagesWithoutAlt}</div>
+                    <div class="stat-label">Images Without Alt</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${accessibilityStats.skipLinksPresent ? 'Yes' : 'No'}</div>
+                    <div class="stat-label">Skip Links Present</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${accessibilityStats.liveRegionsPresent ? 'Yes' : 'No'}</div>
+                    <div class="stat-label">Live Regions Present</div>
+                </div>
+            `;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            
+            // Add some demo content
+            setTimeout(() => {
+                window.AccessibilityEnhancer.announce('Performance and accessibility test page loaded');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

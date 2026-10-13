@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging and Error Handling Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .test-header {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .test-controls {
+            margin: 20px 0;
+        }
+        
+        .test-controls button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .test-controls button:hover {
+            background: #005a87;
+        }
+        
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .debug-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>Logging and Error Handling System Tests</h1>
+        <p>This page tests the centralized logging system and comprehensive error handling functionality.</p>
+    </div>
+
+    <div class="instructions">
+        <h3>Instructions:</h3>
+        <ul>
+            <li>Open the browser console (F12) to see detailed logging output</li>
+            <li>Tests will run automatically when the page loads</li>
+            <li>Use the buttons below to run individual test suites</li>
+            <li>Try pressing <strong>Ctrl+Shift+D</strong> to toggle the debug panel</li>
+            <li>Try pressing <strong>Ctrl+Shift+L</strong> to toggle debug mode</li>
+        </ul>
+    </div>
+
+    <div class="test-controls">
+        <button onclick="testLoggingAndErrorHandling.runAllTests()">Run All Tests</button>
+        <button onclick="testLoggingAndErrorHandling.testLogger()">Test Logger</button>
+        <button onclick="testLoggingAndErrorHandling.testErrorHandler()">Test Error Handler</button>
+        <button onclick="testLoggingAndErrorHandling.testAsyncWrapper()">Test Async Wrapper</button>
+        <button onclick="testLoggingAndErrorHandling.testGracefulDegradation()">Test Graceful Degradation</button>
+        <button onclick="testLoggingAndErrorHandling.testSafeFetch()">Test Safe Fetch</button>
+        <button onclick="Logger.toggleDebugMode()">Toggle Debug Mode</button>
+        <button onclick="window.debugPanel.toggle()">Toggle Debug Panel</button>
+    </div>
+
+    <div class="debug-info">
+        <h3>Debug Information:</h3>
+        <p><strong>Debug Mode:</strong> <span id="debug-mode-status">Loading...</span></p>
+        <p><strong>Log Level:</strong> <span id="log-level-status">Loading...</span></p>
+        <p><strong>Active Timers:</strong> <span id="active-timers">Loading...</span></p>
+        <button onclick="updateDebugInfo()">Refresh Debug Info</button>
+        <button onclick="Logger.clearLogs()">Clear Stored Logs</button>
+        <button onclick="showStoredLogs()">Show Stored Logs</button>
+    </div>
+
+    <div id="stored-logs-container"></div>
+
+    <div class="console-output" id="console-output">
+        <p>Console output will appear here...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/logger.js"></script>
+    <script src="../js/error-handler.js"></script>
+    <script src="../js/debug-panel.js"></script>
+    <script src="logging-error-handling.test.js"></script>
+
+    <script>
+        // Capture console output and display it on the page
+        const consoleOutput = document.getElementById('console-output');
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            debug: console.debug
+        };
+
+        function addToOutput(type, args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const div = document.createElement('div');
+            div.style.color = {
+                log: '#d4d4d4',
+                error: '#f48771',
+                warn: '#dcdcaa',
+                debug: '#9cdcfe'
+            }[type] || '#d4d4d4';
+            
+            div.textContent = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Override console methods
+        console.log = function(...args) {
+            originalConsole.log.apply(console, args);
+            addToOutput('log', args);
+        };
+
+        console.error = function(...args) {
+            originalConsole.error.apply(console, args);
+            addToOutput('error', args);
+        };
+
+        console.warn = function(...args) {
+            originalConsole.warn.apply(console, args);
+            addToOutput('warn', args);
+        };
+
+        console.debug = function(...args) {
+            originalConsole.debug.apply(console, args);
+            addToOutput('debug', args);
+        };
+
+        // Update debug information display
+        function updateDebugInfo() {
+            try {
+                const config = Logger.getConfig();
+                document.getElementById('debug-mode-status').textContent = config.debugMode ? 'ON' : 'OFF';
+                document.getElementById('log-level-status').textContent = Object.keys(Logger.LOG_LEVELS)[config.logLevel];
+                document.getElementById('active-timers').textContent = config.activeTimers.length > 0 ? config.activeTimers.join(', ') : 'None';
+            } catch (error) {
+                console.error('Failed to update debug info:', error);
+            }
+        }
+
+        // Show stored logs
+        function showStoredLogs() {
+            const container = document.getElementById('stored-logs-container');
+            const logs = Logger.getLogs();
+            
+            if (logs.length === 0) {
+                container.innerHTML = '<p>No stored logs available.</p>';
+                return;
+            }
+            
+            const logsHtml = logs.map(log => `
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                    <strong>[${log.level}] ${new Date(log.timestamp).toLocaleString()}</strong><br>
+                    ${log.message}<br>
+                    ${Object.keys(log).filter(k => !['timestamp', 'level', 'message'].includes(k)).length > 0 ? 
+                        '<pre>' + JSON.stringify(Object.fromEntries(Object.entries(log).filter(([k]) => !['timestamp', 'level', 'message'].includes(k))), null, 2) + '</pre>' : ''}
+                </div>
+            `).join('');
+            
+            container.innerHTML = `
+                <h3>Stored Logs (${logs.length} entries):</h3>
+                ${logsHtml}
+            `;
+        }
+
+        // Initialize debug info when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                updateDebugInfo();
+                // Update debug info every 2 seconds
+                setInterval(updateDebugInfo, 2000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

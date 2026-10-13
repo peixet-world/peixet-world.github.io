@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Manager Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Manager Integration Test</h1>
+    <p>This page tests the PDFManager with actual files in the repository.</p>
+    
+    <div class="test-section">
+        <h3>Test Controls</h3>
+        <button onclick="testPDFManager()">Test PDF Manager</button>
+        <button onclick="testPDFValidation()">Test PDF Validation</button>
+        <button onclick="testManifestLoading()">Test Manifest Loading</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+
+    <!-- Include dependencies -->
+    <script src="../js/main.js"></script>
+    <script src="../js/pdf-manager.js"></script>
+
+    <script>
+        let pdfManager;
+
+        function addResult(title, content, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const section = document.createElement('div');
+            section.className = `test-section ${type}`;
+            section.innerHTML = `<h4>${title}</h4><pre>${content}</pre>`;
+            resultsDiv.appendChild(section);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testPDFManager() {
+            try {
+                addResult('PDF Manager Test', 'Initializing PDFManager...', 'info');
+                
+                pdfManager = new PDFManager();
+                
+                const result = `✓ PDFManager created successfully
+Directory: ${pdfManager.pdfDirectory}
+Metadata Directory: ${pdfManager.metadataDirectory}
+Manifest Path: ${pdfManager.manifestPath}`;
+                
+                addResult('PDF Manager Initialization', result, 'success');
+                
+            } catch (error) {
+                addResult('PDF Manager Test Failed', error.message, 'error');
+            }
+        }
+
+        async function testManifestLoading() {
+            try {
+                if (!pdfManager) {
+                    pdfManager = new PDFManager();
+                }
+                
+                addResult('Manifest Loading Test', 'Loading PDF list from manifest...', 'info');
+                
+                const pdfList = await pdfManager.loadPDFList();
+                
+                const result = `✓ Manifest loaded successfully
+PDF Count: ${pdfList.length}
+PDFs Found: ${pdfList.map(pdf => pdf.filename).join(', ')}
+
+PDF Details:
+${pdfList.map(pdf => `- ${pdf.filename} (${pdf.fileSize} bytes)`).join('\n')}`;
+                
+                addResult('Manifest Loading Results', result, 'success');
+                
+                // Test individual PDF retrieval
+                if (pdfList.length > 0) {
+                    const firstPDF = pdfManager.getPDFByFilename(pdfList[0].filename);
+                    addResult('PDF Retrieval Test', 
+                        `✓ Retrieved PDF: ${firstPDF.filename}\nFull Path: ${firstPDF.fullPath}`, 
+                        'success');
+                }
+                
+            } catch (error) {
+                addResult('Manifest Loading Failed', error.message, 'error');
+            }
+        }
+
+        async function testPDFValidation() {
+            try {
+                if (!pdfManager) {
+                    pdfManager = new PDFManager();
+                }
+                
+                addResult('PDF Validation Test', 'Testing PDF file validation...', 'info');
+                
+                // Test with the sample PDF
+                const isValid = await pdfManager.validatePDF('./pdfs/sample-document.pdf');
+                
+                const result = `✓ PDF validation completed
+Sample PDF valid: ${isValid ? 'YES' : 'NO'}`;
+                
+                addResult('PDF Validation Results', result, isValid ? 'success' : 'error');
+                
+                // Test with invalid file (should fail gracefully)
+                try {
+                    const isInvalid = await pdfManager.validatePDF('./nonexistent.pdf');
+                    addResult('Invalid File Test', 
+                        `✓ Invalid file handled gracefully: ${isInvalid ? 'UNEXPECTED' : 'CORRECTLY REJECTED'}`, 
+                        'success');
+                } catch (error) {
+                    addResult('Invalid File Test', 
+                        `✓ Invalid file properly rejected: ${error.message}`, 
+                        'success');
+                }
+                
+            } catch (error) {
+                addResult('PDF Validation Failed', error.message, 'error');
+            }
+        }
+
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            addResult('Integration Test Ready', 
+                'Click the test buttons above to verify PDFManager functionality with actual files.', 
+                'info');
+        });
+    </script>
+</body>
+</html>

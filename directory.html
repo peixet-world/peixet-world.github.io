@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Library - Browse Documents</title>
+    <meta name="description" content="Browse all available PDF documents in the library">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/accessibility.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+</head>
+<body>
+    <header role="banner">
+        <nav role="navigation" aria-label="Main navigation" id="navigation">
+            <div class="logo">
+                <a href="index.html" aria-label="PDF Library - Home">PDF Library</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="directory.html" aria-current="page">Browse PDFs</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main role="main" id="main-content">
+        <section class="directory-header">
+            <h1>PDF Directory</h1>
+            <p>Browse all available documents</p>
+        </section>
+
+        <section class="search-filters" id="search" aria-labelledby="search-heading">
+            <h2 id="search-heading" class="sr-only">Search and Filter Documents</h2>
+            <div class="search-container">
+                <label for="search-input" class="sr-only">Search PDFs by name or tags</label>
+                <input type="text" id="search-input" placeholder="Search PDFs by name or tags..." aria-label="Search PDFs by name or tags" aria-describedby="search-help">
+                <button id="search-btn" type="button" aria-describedby="search-help">Search</button>
+                <div id="search-help" class="sr-only">Enter keywords to search through PDF titles, descriptions, and tags</div>
+            </div>
+            
+            <div class="filter-container">
+                <h3 id="filter-heading">Filter by Tags</h3>
+                <div id="tag-cloud" class="tag-cloud" role="group" aria-labelledby="filter-heading">
+                    <!-- Tag filters will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <section class="pdf-listing" aria-labelledby="documents-heading">
+            <div class="listing-header">
+                <h2 id="documents-heading">Documents</h2>
+                <div class="sort-controls">
+                    <label for="sort-select">Sort by:</label>
+                    <select id="sort-select" aria-describedby="sort-help">
+                        <option value="name">Name</option>
+                        <option value="date">Date Added</option>
+                        <option value="size">File Size</option>
+                    </select>
+                    <div id="sort-help" class="sr-only">Choose how to sort the document list</div>
+                </div>
+            </div>
+            
+            <div id="results-count" class="results-count" aria-live="polite">
+                <!-- Results count will be updated here by JavaScript -->
+            </div>
+            
+            <div id="pdf-list" class="pdf-grid" role="region" aria-label="Document list" aria-live="polite">
+                <!-- PDF list will be loaded here by JavaScript -->
+            </div>
+            
+            <nav id="pagination" class="pagination" role="navigation" aria-label="Document pagination">
+                <!-- Pagination controls will be added here by JavaScript -->
+            </nav>
+        </section>
+    </main>
+
+    <footer role="contentinfo" id="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 PDF Library. Built with GitHub Pages.</p>
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="directory.html">Browse PDFs</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/logger.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/debug-panel.js"></script>
+    <script src="js/performance-optimizer.js"></script>
+    <script src="js/accessibility-enhancer.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pdf-manager.js"></script>
+    <script src="js/tag-system.js"></script>
+</body>
+</html>

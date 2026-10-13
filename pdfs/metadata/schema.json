@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PDF Metadata Schema",
+  "description": "Schema for PDF metadata files used in the PDF sharing website",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Display title for the PDF (required)",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the document content (required)",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "description": "Array of tags for categorization and filtering (required)",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "author": {
+      "type": "string",
+      "description": "Author or creator of the document",
+      "maxLength": 100
+    },
+    "featured": {
+      "type": "boolean",
+      "description": "Whether this PDF should be featured on the homepage",
+      "default": false
+    },
+    "uploadDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date when the PDF was uploaded"
+    },
+    "pageCount": {
+      "type": "integer",
+      "description": "Number of pages in the PDF",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "fileSize": {
+      "type": "integer",
+      "description": "File size in bytes",
+      "minimum": 1
+    },
+    "category": {
+      "type": "string",
+      "description": "Primary category for the document",
+      "maxLength": 50
+    },
+    "language": {
+      "type": "string",
+      "description": "Primary language of the document (ISO 639-1 code)",
+      "pattern": "^[a-z]{2}$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Document version number",
+      "maxLength": 20
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 30
+      },
+      "description": "Additional keywords for search optimization",
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "lastModified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date when the document was last modified"
+    },
+    "downloadCount": {
+      "type": "integer",
+      "description": "Number of times the PDF has been downloaded",
+      "minimum": 0,
+      "default": 0
+    },
+    "accessLevel": {
+      "type": "string",
+      "enum": ["public", "restricted"],
+      "description": "Access level for the document",
+      "default": "public"
+    }
+  },
+  "required": ["title", "description", "tags"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "title": "User Manual v2.1",
+      "description": "Complete user manual covering all features and functionality",
+      "tags": ["manual", "user-guide", "instructions"],
+      "author": "Documentation Team",
+      "featured": true,
+      "category": "Documentation",
+      "language": "en",
+      "version": "2.1"
+    }
+  ]
+}

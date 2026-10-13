@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TagSystem Test Runner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        #output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .status.running {
+            color: #007bff;
+        }
+        
+        .status.success {
+            color: #28a745;
+        }
+        
+        .status.error {
+            color: #dc3545;
+        }
+        
+        .test-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .test-info h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        
+        .test-info ul {
+            margin-bottom: 0;
+        }
+        
+        .test-info li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TagSystem Test Runner</h1>
+        
+        <div class="test-info">
+            <h3>Test Coverage</h3>
+            <p>This test suite covers the TagSystem class functionality including:</p>
+            <ul>
+                <li>Initialization and setup</li>
+                <li>Tag extraction and management</li>
+                <li>PDF filtering by tags</li>
+                <li>Search functionality</li>
+                <li>Tag cloud rendering</li>
+                <li>Statistics and utility methods</li>
+                <li>Error handling</li>
+            </ul>
+        </div>
+        
+        <div class="test-controls">
+            <button id="runTests" class="btn">Run All Tests</button>
+            <button id="clearOutput" class="btn">Clear Output</button>
+        </div>
+        
+        <div id="status" class="status"></div>
+        <div id="output"></div>
+    </div>
+
+    <!-- Load the TagSystem class -->
+    <script src="../js/tag-system.js"></script>
+    
+    <!-- Load the test suite -->
+    <script src="tag-system.test.js"></script>
+    
+    <script>
+        const runTestsBtn = document.getElementById('runTests');
+        const clearOutputBtn = document.getElementById('clearOutput');
+        const statusDiv = document.getElementById('status');
+        const outputDiv = document.getElementById('output');
+        
+        // Override console methods to capture output
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            debug: console.debug
+        };
+        
+        let capturedOutput = '';
+        
+        function captureConsole() {
+            console.log = (...args) => {
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                capturedOutput += message + '\n';
+                originalConsole.log(...args);
+            };
+            
+            console.error = (...args) => {
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                capturedOutput += 'ERROR: ' + message + '\n';
+                originalConsole.error(...args);
+            };
+            
+            console.debug = (...args) => {
+                // Suppress debug output in tests
+            };
+        }
+        
+        function restoreConsole() {
+            console.log = originalConsole.log;
+            console.error = originalConsole.error;
+            console.debug = originalConsole.debug;
+        }
+        
+        async function runTests() {
+            runTestsBtn.disabled = true;
+            statusDiv.textContent = 'Running tests...';
+            statusDiv.className = 'status running';
+            capturedOutput = '';
+            outputDiv.textContent = '';
+            
+            try {
+                captureConsole();
+                
+                const testSuite = new TagSystemTests();
+                await testSuite.runAllTests();
+                
+                restoreConsole();
+                
+                outputDiv.textContent = capturedOutput;
+                
+                if (testSuite.failed === 0) {
+                    statusDiv.textContent = `All ${testSuite.passed} tests passed!`;
+                    statusDiv.className = 'status success';
+                } else {
+                    statusDiv.textContent = `${testSuite.failed} of ${testSuite.passed + testSuite.failed} tests failed`;
+                    statusDiv.className = 'status error';
+                }
+                
+            } catch (error) {
+                restoreConsole();
+                statusDiv.textContent = 'Test execution failed';
+                statusDiv.className = 'status error';
+                outputDiv.textContent = capturedOutput + '\nFATAL ERROR: ' + error.message;
+                console.error('Test execution failed:', error);
+            }
+            
+            runTestsBtn.disabled = false;
+        }
+        
+        function clearOutput() {
+            outputDiv.textContent = '';
+            statusDiv.textContent = '';
+            statusDiv.className = 'status';
+        }
+        
+        runTestsBtn.addEventListener('click', runTests);
+        clearOutputBtn.addEventListener('click', clearOutput);
+        
+        // Auto-run tests on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runTests, 500);
+        });
+    </script>
+</body>
+</html>

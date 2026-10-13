@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Manager Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .pass { color: green; }
+        .fail { color: red; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Manager Unit Tests</h1>
+    <p>This page runs unit tests for the PDFManager class.</p>
+    
+    <button onclick="runTests()">Run Tests</button>
+    
+    <div id="results" class="test-results" style="display: none;">
+        <h3>Test Results</h3>
+        <div id="test-output"></div>
+    </div>
+
+    <!-- Include dependencies -->
+    <script src="../js/main.js"></script>
+    <script src="../js/pdf-manager.js"></script>
+    <script src="pdf-manager.test.js"></script>
+
+    <script>
+        async function runTests() {
+            const resultsDiv = document.getElementById('results');
+            const outputDiv = document.getElementById('test-output');
+            
+            resultsDiv.style.display = 'block';
+            outputDiv.innerHTML = '<p>Running tests...</p>';
+            
+            try {
+                const results = await window.PDFManagerTests.run();
+                
+                let html = '<h4>Summary</h4>';
+                const passed = results.filter(r => r.status === 'PASS').length;
+                const failed = results.filter(r => r.status === 'FAIL').length;
+                
+                html += `<p><strong>Total:</strong> ${results.length} tests</p>`;
+                html += `<p class="pass"><strong>Passed:</strong> ${passed}</p>`;
+                html += `<p class="fail"><strong>Failed:</strong> ${failed}</p>`;
+                
+                html += '<h4>Detailed Results</h4>';
+                html += '<ul>';
+                
+                results.forEach(result => {
+                    const className = result.status === 'PASS' ? 'pass' : 'fail';
+                    html += `<li class="${className}">`;
+                    html += `<strong>${result.status}:</strong> ${result.name}`;
+                    if (result.error) {
+                        html += `<br><small>Error: ${result.error}</small>`;
+                    }
+                    html += '</li>';
+                });
+                
+                html += '</ul>';
+                outputDiv.innerHTML = html;
+                
+            } catch (error) {
+                outputDiv.innerHTML = `<p class="fail">Test execution failed: ${error.message}</p>`;
+            }
+        }
+        
+        // Auto-run tests on page load for development
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Test runner loaded. Click "Run Tests" to execute tests.');
+        });
+    </script>
+</body>
+</html>

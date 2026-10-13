@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment Integration Test Runner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .demo-container {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>Comment Integration Test Runner</h1>
+    
+    <div class="test-container">
+        <h2>Unit Tests</h2>
+        <button onclick="runUnitTests()">Run Unit Tests</button>
+        <div id="unit-test-output" class="test-output"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Integration Demo</h2>
+        <p>This section demonstrates the CommentIntegration class functionality:</p>
+        
+        <button onclick="testValidConfig()">Test Valid Config</button>
+        <button onclick="testInvalidConfig()">Test Invalid Config</button>
+        <button onclick="testGiscusSetup()">Test Giscus Setup</button>
+        <button onclick="testFallback()">Test Fallback Message</button>
+        
+        <div class="demo-container">
+            <h3>Comment Section Demo</h3>
+            <div id="comment-demo-container">
+                <p>Click "Test Giscus Setup" or "Test Fallback Message" to see the comment integration in action.</p>
+            </div>
+        </div>
+        
+        <div id="integration-output" class="test-output"></div>
+    </div>
+
+    <!-- Load the comment integration class -->
+    <script src="../js/comment-integration.js"></script>
+    <script src="comment-integration.test.js"></script>
+    
+    <script>
+        // Capture console output for display
+        function captureConsole(outputElementId) {
+            const outputElement = document.getElementById(outputElementId);
+            const originalLog = console.log;
+            const originalError = console.error;
+            
+            outputElement.innerHTML = '';
+            
+            console.log = function(...args) {
+                outputElement.innerHTML += args.join(' ') + '\n';
+                originalLog.apply(console, args);
+            };
+            
+            console.error = function(...args) {
+                outputElement.innerHTML += args.join(' ') + '\n';
+                originalError.apply(console, args);
+            };
+            
+            return function restore() {
+                console.log = originalLog;
+                console.error = originalError;
+            };
+        }
+
+        // Run unit tests
+        function runUnitTests() {
+            const restore = captureConsole('unit-test-output');
+            
+            try {
+                runCommentIntegrationTests();
+            } catch (error) {
+                console.error('Test execution failed:', error);
+            } finally {
+                restore();
+            }
+        }
+
+        // Test configurations
+        const validConfig = {
+            repo: 'testuser/test-repo',
+            repoId: 'R_test123',
+            category: 'General',
+            categoryId: 'DIC_test456',
+            features: { comments: true }
+        };
+
+        const invalidConfig = {
+            repo: 'testuser/test-repo'
+            // Missing required fields
+        };
+
+        // Integration test functions
+        function testValidConfig() {
+            const restore = captureConsole('integration-output');
+            
+            try {
+                console.log('=== Testing Valid Configuration ===');
+                const commentIntegration = new CommentIntegration(validConfig);
+                console.log('✅ CommentIntegration created successfully');
+                
+                const isValid = commentIntegration.validateConfig();
+                console.log(`✅ Configuration validation: ${isValid}`);
+                
+                const isAvailable = commentIntegration.isCommentsAvailable();
+                console.log(`✅ Comments available: ${isAvailable}`);
+                
+            } catch (error) {
+                console.error('❌ Error testing valid config:', error);
+            } finally {
+                restore();
+            }
+        }
+
+        function testInvalidConfig() {
+            const restore = captureConsole('integration-output');
+            
+            try {
+                console.log('=== Testing Invalid Configuration ===');
+                const commentIntegration = new CommentIntegration(invalidConfig);
+                console.log('✅ CommentIntegration created (with invalid config)');
+                
+                const isValid = commentIntegration.validateConfig();
+                console.log(`✅ Configuration validation: ${isValid} (should be false)`);
+                
+                const isAvailable = commentIntegration.isCommentsAvailable();
+                console.log(`✅ Comments available: ${isAvailable} (should be false)`);
+                
+            } catch (error) {
+                console.error('❌ Error testing invalid config:', error);
+            } finally {
+                restore();
+            }
+        }
+
+        async function testGiscusSetup() {
+            const restore = captureConsole('integration-output');
+            const container = document.getElementById('comment-demo-container');
+            
+            try {
+                console.log('=== Testing Giscus Setup ===');
+                const commentIntegration = new CommentIntegration(validConfig);
+                
+                // Initialize comments for a test PDF
+                const initResult = await commentIntegration.initializeComments('test-document');
+                console.log(`✅ Initialize comments result: ${initResult}`);
+                
+                // Note: This will fail in test environment since we don't have real Giscus config
+                // But it demonstrates the setup process
+                console.log('⚠️  Note: Giscus setup will show fallback since this is a test environment');
+                const setupResult = await commentIntegration.setupGiscus(container);
+                console.log(`✅ Setup Giscus result: ${setupResult}`);
+                
+            } catch (error) {
+                console.error('❌ Error testing Giscus setup:', error);
+            } finally {
+                restore();
+            }
+        }
+
+        function testFallback() {
+            const restore = captureConsole('integration-output');
+            const container = document.getElementById('comment-demo-container');
+            
+            try {
+                console.log('=== Testing Fallback Message ===');
+                const commentIntegration = new CommentIntegration(validConfig);
+                
+                commentIntegration.showFallbackMessage(container);
+                console.log('✅ Fallback message displayed in demo container');
+                
+            } catch (error) {
+                console.error('❌ Error testing fallback:', error);
+            } finally {
+                restore();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Comment Integration Test Runner loaded');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job: validates content and assembles the site data. Runs on pushes and PRs.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Full history so uploadDate can be read from git log per PDF
+          fetch-depth: 0
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v6
+
+      - name: Generate manifest and inject repository config
+        env:
+          GISCUS_REPO_ID: ${{ vars.GISCUS_REPO_ID }}
+          GISCUS_CATEGORY_ID: ${{ vars.GISCUS_CATEGORY_ID }}
+        run: python3 scripts/build-site.py
+
+      - name: Validate JavaScript syntax
+        run: |
+          for f in js/*.js tests/*.test.js; do
+            node --check "$f"
+          done
+
+      - name: Check Giscus setup (non-blocking)
+        if: github.event_name != 'pull_request'
+        run: |
+          repo='${{ github.repository }}'
+          category=$(python3 -c "import json; print(json.load(open('config.json'))['giscus'].get('category', 'General'))")
+          response=$(curl -sG https://giscus.app/api/discussions \
+            --data-urlencode "repo=$repo" \
+            --data-urlencode "category=$category" \
+            --data-urlencode "term=/" \
+            -d "number=0&strict=true&first=1" || true)
+          case "$response" in
+            *'"discussion"'*|*"Discussion not found"*)
+              echo "Giscus is installed and reachable."
+              ;;
+            *"not installed"*)
+              echo "::warning::Giscus app is not installed on $repo - install it at https://github.com/apps/giscus"
+              ;;
+            *)
+              echo "::warning::Giscus check inconclusive: $(printf '%s' "$response" | head -c 300)"
+              ;;
+          esac
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          # Publishes the repository root; .git, .github and dotfiles are excluded by the action
+          path: .
+
+  # Deployment job: only for real pushes, never for pull requests
+  deploy:
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

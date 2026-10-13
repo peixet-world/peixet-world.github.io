@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-results {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .test-summary {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .test-details {
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .run-tests-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .run-tests-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Viewer Tests</h1>
+    <p>This page tests the PDFViewer class functionality.</p>
+    
+    <button class="run-tests-btn" onclick="runTests()">Run Tests</button>
+    
+    <div id="test-results"></div>
+
+    <!-- Include dependencies -->
+    <script>
+        // Mock Logger for tests
+        class Logger {
+            static info(message, data = {}) {
+                console.log(`[INFO] ${message}`, data);
+            }
+            
+            static error(message, error = null) {
+                console.error(`[ERROR] ${message}`, error);
+            }
+            
+            static debug(message, data = {}) {
+                console.debug(`[DEBUG] ${message}`, data);
+            }
+        }
+
+        // Mock DOM utility
+        const DOM = {
+            createElement(tag, className = '', textContent = '') {
+                const element = document.createElement(tag);
+                if (className) element.className = className;
+                if (textContent) element.textContent = textContent;
+                return element;
+            }
+        };
+
+        // Simple test framework
+        class TestFramework {
+            constructor() {
+                this.tests = [];
+                this.currentSuite = null;
+                this.results = {
+                    passed: 0,
+                    failed: 0,
+                    errors: []
+                };
+            }
+
+            describe(name, fn) {
+                this.currentSuite = name;
+                console.log(`\n--- ${name} ---`);
+                fn();
+                this.currentSuite = null;
+            }
+
+            test(name, fn) {
+                try {
+                    fn();
+                    this.results.passed++;
+                    console.log(`✓ ${name}`);
+                } catch (error) {
+                    this.results.failed++;
+                    this.results.errors.push({
+                        suite: this.currentSuite,
+                        test: name,
+                        error: error.message
+                    });
+                    console.error(`✗ ${name}: ${error.message}`);
+                }
+            }
+
+            beforeEach(fn) {
+                // Simple implementation - would need more sophisticated handling for real use
+                this.beforeEachFn = fn;
+            }
+
+            afterEach(fn) {
+                // Simple implementation
+                this.afterEachFn = fn;
+            }
+
+            expect(actual) {
+                return {
+                    toBe: (expected) => {
+                        if (actual !== expected) {
+                            throw new Error(`Expected ${expected}, got ${actual}`);
+                        }
+                    },
+                    toBeCloseTo: (expected, precision = 2) => {
+                        const diff = Math.abs(actual - expected);
+                        const tolerance = Math.pow(10, -precision);
+                        if (diff > tolerance) {
+                            throw new Error(`Expected ${actual} to be close to ${expected}`);
+                        }
+                    },
+                    toBeTruthy: () => {
+                        if (!actual) {
+                            throw new Error(`Expected ${actual} to be truthy`);
+                        }
+                    },
+                    toThrow: (expectedMessage) => {
+                        // For async functions that should throw
+                        return actual.catch(error => {
+                            if (expectedMessage && !error.message.includes(expectedMessage)) {
+                                throw new Error(`Expected error to contain "${expectedMessage}", got "${error.message}"`);
+                            }
+                        });
+                    },
+                    rejects: {
+                        toThrow: (expectedMessage) => {
+                            return actual.catch(error => {
+                                if (expectedMessage && !error.message.includes(expectedMessage)) {
+                                    throw new Error(`Expected error to contain "${expectedMessage}", got "${error.message}"`);
+                                }
+                                return true; // Expected rejection occurred
+                            }).then(result => {
+                                if (result !== true) {
+                                    throw new Error('Expected promise to reject, but it resolved');
+                                }
+                            });
+                        }
+                    }
+                };
+            }
+
+            getResults() {
+                return this.results;
+            }
+        }
+
+        // Create global test framework instance
+        const framework = new TestFramework();
+        const describe = framework.describe.bind(framework);
+        const test = framework.test.bind(framework);
+        const beforeEach = framework.beforeEach.bind(framework);
+        const afterEach = framework.afterEach.bind(framework);
+        const expect = framework.expect.bind(framework);
+
+        // Mock jest functions
+        const jest = {
+            fn: () => {
+                const mockFn = function(...args) {
+                    mockFn.calls.push(args);
+                    return mockFn.returnValue;
+                };
+                mockFn.calls = [];
+                mockFn.returnValue = undefined;
+                return mockFn;
+            },
+            clearAllMocks: () => {
+                // Simple implementation
+            }
+        };
+    </script>
+
+    <!-- Include the PDFViewer class -->
+    <script>
+        // Mock PDF.js for testing
+        const mockPdfjsLib = {
+            GlobalWorkerOptions: { workerSrc: '' },
+            getDocument: (url) => ({
+                promise: Promise.resolve({
+                    numPages: 3,
+                    getPage: (pageNum) => Promise.resolve({
+                        getViewport: ({ scale }) => ({
+                            width: 612 * scale,
+                            height: 792 * scale
+                        }),
+                        render: (context) => ({
+                            promise: Promise.resolve()
+                        })
+                    })
+                })
+            })
+        };
+
+        // Make pdfjsLib available globally
+        window.pdfjsLib = mockPdfjsLib;
+
+        // PDFViewer class (simplified version for testing)
+        class PDFViewer {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.pdfDoc = null;
+                this.currentPage = 1;
+                this.totalPages = 0;
+                this.scale = 1.0;
+                this.renderTask = null;
+                this.pdfUrl = null;
+                
+                if (typeof pdfjsLib !== 'undefined') {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                }
+            }
+            
+            async loadPDF(url) {
+                this.showLoadingIndicator(true);
+                this.hideErrorMessage();
+                this.pdfUrl = url;
+                
+                const loadingTask = pdfjsLib.getDocument(url);
+                this.pdfDoc = await loadingTask.promise;
+                
+                this.totalPages = this.pdfDoc.numPages;
+                this.currentPage = 1;
+                
+                await this.renderPage(this.currentPage);
+                this.updatePageInfo();
+                this.updateControls();
+                this.showLoadingIndicator(false);
+            }
+            
+            async renderPage(pageNum) {
+                if (!this.pdfDoc || pageNum < 1 || pageNum > this.totalPages) {
+                    throw new Error(`Invalid page number: ${pageNum}`);
+                }
+                
+                if (this.renderTask) {
+                    this.renderTask.cancel();
+                }
+                
+                const page = await this.pdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({ scale: this.scale });
+                
+                this.canvas.height = viewport.height;
+                this.canvas.width = viewport.width;
+                
+                const renderContext = {
+                    canvasContext: this.ctx,
+                    viewport: viewport
+                };
+                
+                this.renderTask = page.render(renderContext);
+                await this.renderTask.promise;
+                this.currentPage = pageNum;
+            }
+            
+            async nextPage() {
+                if (this.currentPage < this.totalPages) {
+                    await this.renderPage(this.currentPage + 1);
+                    this.updatePageInfo();
+                    this.updateControls();
+                }
+            }
+            
+            async prevPage() {
+                if (this.currentPage > 1) {
+                    await this.renderPage(this.currentPage - 1);
+                    this.updatePageInfo();
+                    this.updateControls();
+                }
+            }
+            
+            async goToPage(pageNum) {
+                const page = parseInt(pageNum, 10);
+                if (page >= 1 && page <= this.totalPages) {
+                    await this.renderPage(page);
+                    this.updatePageInfo();
+                    this.updateControls();
+                }
+            }
+            
+            async setZoom(scale) {
+                if (scale > 0 && scale <= 5.0) {
+                    this.scale = scale;
+                    await this.renderPage(this.currentPage);
+                    this.updateZoomDisplay();
+                }
+            }
+            
+            async zoomIn() {
+                const newScale = Math.min(this.scale * 1.25, 5.0);
+                await this.setZoom(newScale);
+            }
+            
+            async zoomOut() {
+                const newScale = Math.max(this.scale / 1.25, 0.25);
+                await this.setZoom(newScale);
+            }
+            
+            async fitToWidth() {
+                if (!this.pdfDoc) return;
+                
+                const page = await this.pdfDoc.getPage(this.currentPage);
+                const viewport = page.getViewport({ scale: 1.0 });
+                
+                const container = this.canvas.parentElement;
+                const containerWidth = container.clientWidth - 40;
+                
+                const scale = containerWidth / viewport.width;
+                await this.setZoom(scale);
+            }
+            
+            getDownloadUrl() {
+                return this.pdfUrl;
+            }
+            
+            updatePageInfo() {
+                const pageInfo = document.getElementById('page-info');
+                if (pageInfo) {
+                    pageInfo.textContent = `Page ${this.currentPage} of ${this.totalPages}`;
+                }
+                
+                const pageInput = document.getElementById('page-input');
+                if (pageInput) {
+                    pageInput.value = this.currentPage;
+                    pageInput.max = this.totalPages;
+                }
+            }
+            
+            updateControls() {
+                const prevBtn = document.getElementById('prev-page');
+                const nextBtn = document.getElementById('next-page');
+                
+                if (prevBtn) {
+                    prevBtn.disabled = this.currentPage <= 1;
+                }
+                
+                if (nextBtn) {
+                    nextBtn.disabled = this.currentPage >= this.totalPages;
+                }
+            }
+            
+            updateZoomDisplay() {
+                const zoomLevel = document.getElementById('zoom-level');
+                if (zoomLevel) {
+                    zoomLevel.textContent = `${Math.round(this.scale * 100)}%`;
+                }
+            }
+            
+            showLoadingIndicator(show) {
+                const indicator = document.getElementById('loading-indicator');
+                if (indicator) {
+                    indicator.style.display = show ? 'block' : 'none';
+                }
+            }
+            
+            showErrorMessage(message) {
+                const errorEl = document.getElementById('error-message');
+                if (errorEl) {
+                    errorEl.querySelector('p').textContent = message;
+                    errorEl.style.display = 'block';
+                }
+            }
+            
+            hideErrorMessage() {
+                const errorEl = document.getElementById('error-message');
+                if (errorEl) {
+                    errorEl.style.display = 'none';
+                }
+            }
+        }
+
+        function showViewerError(message) {
+            const main = document.querySelector('main');
+            if (main) {
+                const errorDiv = DOM.createElement('div', 'error-state');
+                errorDiv.setAttribute('role', 'alert');
+                errorDiv.innerHTML = `
+                    <h2>PDF Viewer Error</h2>
+                    <p>${message}</p>
+                    <div class="error-actions">
+                        <a href="directory.html" class="btn btn-primary">Back to Directory</a>
+                        <button class="btn btn-secondary" onclick="location.reload()">Retry</button>
+                    </div>
+                `;
+                main.insertBefore(errorDiv, main.firstChild);
+            }
+        }
+    </script>
+
+    <!-- Include the tests -->
+    <script src="pdf-viewer.test.js"></script>
+
+    <script>
+        async function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p>Running tests...</p>';
+            
+            try {
+                // Reset results
+                framework.results = {
+                    passed: 0,
+                    failed: 0,
+                    errors: []
+                };
+                
+                // Run the tests (they're already loaded)
+                console.log('Starting PDF Viewer tests...');
+                
+                // The tests are executed when the script loads
+                // We just need to display the results
+                
+                const results = framework.getResults();
+                const total = results.passed + results.failed;
+                
+                let html = `
+                    <div class="test-results ${results.failed === 0 ? 'test-pass' : 'test-fail'}">
+                        <div class="test-summary">
+                            Tests completed: ${total} total, ${results.passed} passed, ${results.failed} failed
+                        </div>
+                `;
+                
+                if (results.errors.length > 0) {
+                    html += '<div class="test-details">Failures:\n';
+                    results.errors.forEach(error => {
+                        html += `${error.suite} - ${error.test}: ${error.error}\n`;
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-results test-fail">
+                        <div class="test-summary">Test execution failed</div>
+                        <div class="test-details">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

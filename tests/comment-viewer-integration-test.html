@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment Viewer Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .demo-container {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background-color: #353b48;
+            color: white;
+            min-height: 200px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        .comments-section {
+            background-color: #353b48;
+            border-top: 1px solid #40485a;
+            padding: 2rem;
+            margin-top: auto;
+            border-radius: 8px;
+        }
+        .comments-section h2 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        #comments-container {
+            background-color: #40485a;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comment Viewer Integration Test</h1>
+    
+    <div class="test-container">
+        <h2>Comment System Integration Test</h2>
+        <p>This test simulates the comment integration in the PDF viewer page.</p>
+        
+        <button onclick="testConfigLoad()">Test Config Loading</button>
+        <button onclick="testCommentInit()">Test Comment Initialization</button>
+        <button onclick="testGiscusSetup()">Test Giscus Setup</button>
+        <button onclick="testFallbackDisplay()">Test Fallback Display</button>
+        <button onclick="testFullIntegration()">Test Full Integration</button>
+        
+        <div id="test-output" class="test-output"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Simulated PDF Viewer Comments Section</h2>
+        <p>This simulates the comments section as it would appear in the PDF viewer:</p>
+        
+        <section id="comments-section" class="comments-section">
+            <h2>Discussion</h2>
+            <div id="comments-container">
+                <p style="color: #e1e5e9; text-align: center; padding: 2rem;">
+                    Comments will be loaded here when you run the tests above.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Load dependencies -->
+    <script>
+        // Mock Logger for testing
+        const Logger = {
+            info: (message, data) => {
+                console.log(`[INFO] ${message}`, data || '');
+                updateTestOutput(`INFO: ${message}`, 'info');
+            },
+            error: (message, data) => {
+                console.error(`[ERROR] ${message}`, data || '');
+                updateTestOutput(`ERROR: ${message}`, 'error');
+            },
+            debug: (message, data) => {
+                console.log(`[DEBUG] ${message}`, data || '');
+                updateTestOutput(`DEBUG: ${message}`, 'info');
+            }
+        };
+
+        function updateTestOutput(message, type = 'info') {
+            const outputDiv = document.getElementById('test-output');
+            const timestamp = new Date().toLocaleTimeString();
+            outputDiv.textContent += `[${timestamp}] ${message}\n`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        // Mock configuration loading
+        async function loadConfiguration() {
+            try {
+                const response = await fetch('../config.json');
+                if (!response.ok) {
+                    throw new Error(`Failed to load configuration: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                Logger.error('Failed to load configuration', error);
+                return null;
+            }
+        }
+
+        // Test functions
+        async function testConfigLoad() {
+            updateTestOutput('=== Testing Configuration Loading ===', 'info');
+            
+            try {
+                const config = await loadConfiguration();
+                if (config && config.giscus) {
+                    updateTestOutput('✅ Configuration loaded successfully', 'success');
+                    updateTestOutput(`Repository: ${config.giscus.repo}`, 'info');
+                    updateTestOutput(`Category: ${config.giscus.category}`, 'info');
+                } else {
+                    updateTestOutput('❌ Configuration missing or invalid', 'error');
+                }
+            } catch (error) {
+                updateTestOutput(`❌ Configuration loading failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCommentInit() {
+            updateTestOutput('=== Testing Comment Initialization ===', 'info');
+            
+            try {
+                const config = await loadConfiguration();
+                if (!config || !config.giscus) {
+                    updateTestOutput('❌ No configuration available', 'error');
+                    return;
+                }
+
+                const commentIntegration = new CommentIntegration(config.giscus);
+                updateTestOutput('✅ CommentIntegration instance created', 'success');
+
+                const isAvailable = commentIntegration.isCommentsAvailable();
+                updateTestOutput(`✅ Comments available: ${isAvailable}`, isAvailable ? 'success' : 'error');
+
+                const pdfId = 'test-document-' + Date.now();
+                const initResult = await commentIntegration.initializeComments(pdfId);
+                updateTestOutput(`✅ Initialize comments result: ${initResult}`, initResult ? 'success' : 'error');
+
+            } catch (error) {
+                updateTestOutput(`❌ Comment initialization failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGiscusSetup() {
+            updateTestOutput('=== Testing Giscus Setup ===', 'info');
+            
+            try {
+                const config = await loadConfiguration();
+                if (!config || !config.giscus) {
+                    updateTestOutput('❌ No configuration available', 'error');
+                    return;
+                }
+
+                const commentIntegration = new CommentIntegration(config.giscus);
+                const container = document.getElementById('comments-container');
+                
+                updateTestOutput('⚠️  Note: This will show fallback in test environment', 'info');
+                const setupResult = await commentIntegration.setupGiscus(container);
+                updateTestOutput(`✅ Giscus setup result: ${setupResult}`, setupResult ? 'success' : 'error');
+
+            } catch (error) {
+                updateTestOutput(`❌ Giscus setup failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testFallbackDisplay() {
+            updateTestOutput('=== Testing Fallback Display ===', 'info');
+            
+            try {
+                const container = document.getElementById('comments-container');
+                
+                // Simulate the fallback function from main.js
+                container.innerHTML = `
+                    <div class="comment-fallback">
+                        <p>Comments are currently unavailable for testing.</p>
+                        <p>You can still discuss this document by:</p>
+                        <ul>
+                            <li><a href="https://github.com/username/username.github.io/discussions" target="_blank" rel="noopener">Creating a GitHub Discussion</a></li>
+                            <li><a href="https://github.com/username/username.github.io/issues/new" target="_blank" rel="noopener">Opening an Issue</a></li>
+                        </ul>
+                    </div>
+                `;
+                
+                updateTestOutput('✅ Fallback message displayed successfully', 'success');
+                
+            } catch (error) {
+                updateTestOutput(`❌ Fallback display failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFullIntegration() {
+            updateTestOutput('=== Testing Full Integration ===', 'info');
+            
+            try {
+                // Simulate the full initializeCommentSystem function
+                const pdfFile = 'sample-document.pdf';
+                updateTestOutput(`Initializing comment system for: ${pdfFile}`, 'info');
+
+                const config = await loadConfiguration();
+                if (!config || !config.giscus) {
+                    updateTestOutput('❌ No Giscus configuration found', 'error');
+                    testFallbackDisplay();
+                    return;
+                }
+
+                if (config.features && config.features.comments === false) {
+                    updateTestOutput('ℹ️  Comments disabled in configuration', 'info');
+                    return;
+                }
+
+                const commentIntegration = new CommentIntegration(config.giscus);
+                
+                if (!commentIntegration.isCommentsAvailable()) {
+                    updateTestOutput('❌ Comments not available', 'error');
+                    testFallbackDisplay();
+                    return;
+                }
+
+                const pdfId = pdfFile.replace(/\.pdf$/i, '');
+                const initResult = await commentIntegration.initializeComments(pdfId);
+                
+                if (!initResult) {
+                    updateTestOutput('❌ Failed to initialize comments', 'error');
+                    testFallbackDisplay();
+                    return;
+                }
+
+                const commentsContainer = document.getElementById('comments-container');
+                const setupResult = await commentIntegration.setupGiscus(commentsContainer);
+                
+                if (setupResult) {
+                    updateTestOutput('✅ Full integration successful', 'success');
+                } else {
+                    updateTestOutput('⚠️  Setup failed, showing fallback', 'error');
+                }
+
+            } catch (error) {
+                updateTestOutput(`❌ Full integration failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTestOutput('Comment Viewer Integration Test loaded', 'info');
+            updateTestOutput('Click buttons above to test different aspects of the integration', 'info');
+        });
+    </script>
+    
+    <!-- Load the CommentIntegration class -->
+    <script src="../js/comment-integration.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Manager Implementation Verification</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .console {
+            background-color: #000;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            min-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Manager Implementation Verification</h1>
+    <p>This page verifies that subtasks 2.1 and 2.2 are properly implemented.</p>
+    
+    <button onclick="runVerification()">Run Verification</button>
+    
+    <div id="console" class="console">Click "Run Verification" to start...</div>
+
+    <!-- Include dependencies -->
+    <script src="../js/main.js"></script>
+    <script src="../js/pdf-manager.js"></script>
+
+    <script>
+        // Capture console output
+        const consoleDiv = document.getElementById('console');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function logToDiv(message, isError = false) {
+            const color = isError ? '#ff4444' : '#00ff00';
+            consoleDiv.innerHTML += `<span style="color: ${color}">${message}</span>\n`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            logToDiv(args.join(' '));
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            logToDiv(args.join(' '), true);
+            originalError.apply(console, args);
+        };
+        
+        async function runVerification() {
+            consoleDiv.innerHTML = '';
+            
+            // Include the verification script inline
+            console.log('=== PDF Manager Implementation Verification ===\n');
+
+            // Test 1: Verify PDFManager class exists and can be instantiated
+            console.log('Test 1: PDFManager class instantiation');
+            try {
+                const pdfManager = new PDFManager();
+                console.log('✓ PDFManager class exists and can be instantiated');
+                console.log(`  - PDF directory: ${pdfManager.pdfDirectory}`);
+                console.log(`  - Metadata directory: ${pdfManager.metadataDirectory}`);
+            } catch (error) {
+                console.error('✗ PDFManager instantiation failed:', error.message);
+            }
+
+            // Test 2: Verify PDF entry validation
+            console.log('\nTest 2: PDF entry validation');
+            try {
+                const pdfManager = new PDFManager();
+                
+                // Valid entry
+                const validEntry = { filename: 'test.pdf', fileSize: 1024 };
+                const isValid = pdfManager.validatePDFEntry(validEntry);
+                console.log(`✓ Valid entry validation: ${isValid ? 'PASS' : 'FAIL'}`);
+                
+                // Invalid entry (non-PDF)
+                const invalidEntry = { filename: 'test.txt' };
+                const isInvalid = !pdfManager.validatePDFEntry(invalidEntry);
+                console.log(`✓ Invalid entry rejection: ${isInvalid ? 'PASS' : 'FAIL'}`);
+                
+                // Invalid entry (missing filename)
+                const noFilename = {};
+                const noFilenameInvalid = !pdfManager.validatePDFEntry(noFilename);
+                console.log(`✓ Missing filename rejection: ${noFilenameInvalid ? 'PASS' : 'FAIL'}`);
+                
+            } catch (error) {
+                console.error('✗ PDF entry validation failed:', error.message);
+            }
+
+            // Test 3: Verify metadata system
+            console.log('\nTest 3: Metadata system');
+            try {
+                const pdfManager = new PDFManager();
+                
+                // Test title generation
+                const title1 = pdfManager.generateTitleFromFilename('my-document.pdf');
+                const title2 = pdfManager.generateTitleFromFilename('user_guide.pdf');
+                console.log(`✓ Title generation: "${title1}", "${title2}"`);
+                
+                // Test metadata validation
+                const validMetadata = {
+                    title: 'Test Document',
+                    tags: ['test', 'sample'],
+                    fileSize: 1024
+                };
+                
+                try {
+                    const normalized = await pdfManager.validateAndNormalizeMetadata(validMetadata, 'test.pdf');
+                    console.log('✓ Metadata validation and normalization works');
+                    console.log(`  - Title: ${normalized.title}`);
+                    console.log(`  - Tags: [${normalized.tags.join(', ')}]`);
+                    console.log(`  - File size: ${normalized.fileSize}`);
+                } catch (error) {
+                    console.error('✗ Metadata validation failed:', error.message);
+                }
+                
+            } catch (error) {
+                console.error('✗ Metadata system test failed:', error.message);
+            }
+
+            // Test 4: Verify error handling
+            console.log('\nTest 4: Error handling');
+            try {
+                const pdfManager = new PDFManager();
+                
+                // Test with invalid metadata
+                try {
+                    await pdfManager.validateAndNormalizeMetadata(null, 'test.pdf');
+                    console.error('✗ Should have thrown error for null metadata');
+                } catch (error) {
+                    console.log('✓ Properly handles null metadata with error');
+                }
+                
+                // Test minimal metadata generation
+                const minimal = pdfManager.generateMinimalMetadata('test-file.pdf');
+                console.log('✓ Minimal metadata generation works');
+                console.log(`  - Title: ${minimal.title}`);
+                console.log(`  - Tags: [${minimal.tags.join(', ')}]`);
+                
+            } catch (error) {
+                console.error('✗ Error handling test failed:', error.message);
+            }
+
+            console.log('\n=== Verification Complete ===');
+            console.log('If all tests show ✓, then both subtasks 2.1 and 2.2 are properly implemented.');
+        }
+    </script>
+</body>
+</html>

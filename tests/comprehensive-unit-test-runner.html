@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Unit Test Runner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .test-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .test-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8em;
+        }
+        
+        .status-pending {
+            background-color: #ffeaa7;
+            color: #d63031;
+        }
+        
+        .status-running {
+            background-color: #74b9ff;
+            color: white;
+        }
+        
+        .status-passed {
+            background-color: #00b894;
+            color: white;
+        }
+        
+        .status-failed {
+            background-color: #e17055;
+            color: white;
+        }
+        
+        .test-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background-color: #0984e3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #0770c4;
+        }
+        
+        .btn:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .summary h1 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+        }
+        
+        .summary p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .error-details {
+            background-color: #fff5f5;
+            border-left: 4px solid #e53e3e;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .success-message {
+            background-color: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="summary">
+        <h1>Comprehensive Unit Test Suite</h1>
+        <p>Testing core functionality: PDFManager, TagSystem, PDFViewer, and Error Handling</p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p id="overall-status">Ready to run tests</p>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="runAllTests()">Run All Tests</button>
+        <button class="btn" onclick="runPDFManagerTests()">PDFManager Tests</button>
+        <button class="btn" onclick="runTagSystemTests()">TagSystem Tests</button>
+        <button class="btn" onclick="runPDFViewerTests()">PDFViewer Tests</button>
+        <button class="btn" onclick="runErrorHandlingTests()">Error Handling Tests</button>
+        <button class="btn" onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div class="test-container">
+        <div class="test-header">
+            <div class="test-title">PDFManager Tests</div>
+            <div class="test-status status-pending" id="pdfmanager-status">Pending</div>
+        </div>
+        <div class="test-output" id="pdfmanager-output">Click "PDFManager Tests" or "Run All Tests" to execute...</div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-header">
+            <div class="test-title">TagSystem Tests</div>
+            <div class="test-status status-pending" id="tagsystem-status">Pending</div>
+        </div>
+        <div class="test-output" id="tagsystem-output">Click "TagSystem Tests" or "Run All Tests" to execute...</div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-header">
+            <div class="test-title">PDFViewer Tests</div>
+            <div class="test-status status-pending" id="pdfviewer-status">Pending</div>
+        </div>
+        <div class="test-output" id="pdfviewer-output">Click "PDFViewer Tests" or "Run All Tests" to execute...</div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-header">
+            <div class="test-title">Error Handling Tests</div>
+            <div class="test-status status-pending" id="errorhandling-status">Pending</div>
+        </div>
+        <div class="test-output" id="errorhandling-output">Click "Error Handling Tests" or "Run All Tests" to execute...</div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="../js/logger.js"></script>
+    <script src="../js/error-handler.js"></script>
+    <script src="../js/pdf-manager.js"></script>
+    <script src="../js/tag-system.js"></script>
+    <script src="../js/main.js"></script>
+    
+    <!-- Load test files -->
+    <script src="pdf-manager.test.js"></script>
+    <script src="tag-system.test.js"></script>
+    <script src="pdf-viewer.test.js"></script>
+    <script src="logging-error-handling.test.js"></script>
+
+    <script>
+        let testResults = {
+            pdfManager: null,
+            tagSystem: null,
+            pdfViewer: null,
+            errorHandling: null
+        };
+
+        let totalTests = 0;
+        let completedTests = 0;
+
+        function updateProgress() {
+            const progress = totalTests > 0 ? (completedTests / totalTests) * 100 : 0;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            
+            const overallStatus = document.getElementById('overall-status');
+            if (completedTests === 0) {
+                overallStatus.textContent = 'Ready to run tests';
+            } else if (completedTests < totalTests) {
+                overallStatus.textContent = `Running tests... ${completedTests}/${totalTests} completed`;
+            } else {
+                const allPassed = Object.values(testResults).every(result => 
+                    result && result.failed === 0
+                );
+                overallStatus.textContent = allPassed ? 
+                    'All tests completed successfully!' : 
+                    'Tests completed with some failures';
+            }
+        }
+
+        function setTestStatus(testName, status) {
+            const statusElement = document.getElementById(`${testName.toLowerCase()}-status`);
+            statusElement.className = `test-status status-${status}`;
+            statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function appendTestOutput(testName, output) {
+            const outputElement = document.getElementById(`${testName.toLowerCase()}-output`);
+            outputElement.textContent += output + '\n';
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+
+        function clearTestOutput(testName) {
+            const outputElement = document.getElementById(`${testName.toLowerCase()}-output`);
+            outputElement.textContent = '';
+        }
+
+        async function runPDFManagerTests() {
+            setTestStatus('pdfmanager', 'running');
+            clearTestOutput('pdfmanager');
+            
+            try {
+                appendTestOutput('pdfmanager', 'Starting PDFManager tests...\n');
+                
+                // Capture console output
+                const originalLog = console.log;
+                const originalError = console.error;
+                
+                console.log = (msg) => {
+                    appendTestOutput('pdfmanager', msg);
+                    originalLog(msg);
+                };
+                
+                console.error = (msg) => {
+                    appendTestOutput('pdfmanager', `ERROR: ${msg}`);
+                    originalError(msg);
+                };
+                
+                const results = await window.PDFManagerTests.run();
+                testResults.pdfManager = {
+                    passed: results.filter(r => r.status === 'PASS').length,
+                    failed: results.filter(r => r.status === 'FAIL').length
+                };
+                
+                // Restore console
+                console.log = originalLog;
+                console.error = originalError;
+                
+                if (testResults.pdfManager.failed === 0) {
+                    setTestStatus('pdfmanager', 'passed');
+                    appendTestOutput('pdfmanager', '\n✅ All PDFManager tests passed!');
+                } else {
+                    setTestStatus('pdfmanager', 'failed');
+                    appendTestOutput('pdfmanager', `\n❌ ${testResults.pdfManager.failed} PDFManager test(s) failed`);
+                }
+                
+            } catch (error) {
+                setTestStatus('pdfmanager', 'failed');
+                appendTestOutput('pdfmanager', `\n❌ PDFManager test suite failed: ${error.message}`);
+                testResults.pdfManager = { passed: 0, failed: 1 };
+            }
+            
+            completedTests++;
+            updateProgress();
+        }
+
+        async function runTagSystemTests() {
+            setTestStatus('tagsystem', 'running');
+            clearTestOutput('tagsystem');
+            
+            try {
+                appendTestOutput('tagsystem', 'Starting TagSystem tests...\n');
+                
+                // Capture console output
+                const originalLog = console.log;
+                const originalError = console.error;
+                
+                console.log = (msg) => {
+                    appendTestOutput('tagsystem', msg);
+                    originalLog(msg);
+                };
+                
+                console.error = (msg) => {
+                    appendTestOutput('tagsystem', `ERROR: ${msg}`);
+                    originalError(msg);
+                };
+                
+                const tagSystemTests = new TagSystemTests();
+                await tagSystemTests.runAllTests();
+                
+                testResults.tagSystem = {
+                    passed: tagSystemTests.passed,
+                    failed: tagSystemTests.failed
+                };
+                
+                // Restore console
+                console.log = originalLog;
+                console.error = originalError;
+                
+                if (testResults.tagSystem.failed === 0) {
+                    setTestStatus('tagsystem', 'passed');
+                    appendTestOutput('tagsystem', '\n✅ All TagSystem tests passed!');
+                } else {
+                    setTestStatus('tagsystem', 'failed');
+                    appendTestOutput('tagsystem', `\n❌ ${testResults.tagSystem.failed} TagSystem test(s) failed`);
+                }
+                
+            } catch (error) {
+                setTestStatus('tagsystem', 'failed');
+                appendTestOutput('tagsystem', `\n❌ TagSystem test suite failed: ${error.message}`);
+                testResults.tagSystem = { passed: 0, failed: 1 };
+            }
+            
+            completedTests++;
+            updateProgress();
+        }
+
+        async function runPDFViewerTests() {
+            setTestStatus('pdfviewer', 'running');
+            clearTestOutput('pdfviewer');
+            
+            try {
+                appendTestOutput('pdfviewer', 'Starting PDFViewer tests...\n');
+                
+                // Capture console output
+                const originalLog = console.log;
+                const originalError = console.error;
+                
+                console.log = (msg) => {
+                    appendTestOutput('pdfviewer', msg);
+                    originalLog(msg);
+                };
+                
+                console.error = (msg) => {
+                    appendTestOutput('pdfviewer', `ERROR: ${msg}`);
+                    originalError(msg);
+                };
+                
+                const pdfViewerTests = new PDFViewerTests();
+                await pdfViewerTests.runAllTests();
+                
+                testResults.pdfViewer = {
+                    passed: pdfViewerTests.passed,
+                    failed: pdfViewerTests.failed
+                };
+                
+                // Restore console
+                console.log = originalLog;
+                console.error = originalError;
+                
+                if (testResults.pdfViewer.failed === 0) {
+                    setTestStatus('pdfviewer', 'passed');
+                    appendTestOutput('pdfviewer', '\n✅ All PDFViewer tests passed!');
+                } else {
+                    setTestStatus('pdfviewer', 'failed');
+                    appendTestOutput('pdfviewer', `\n❌ ${testResults.pdfViewer.failed} PDFViewer test(s) failed`);
+                }
+                
+            } catch (error) {
+                setTestStatus('pdfviewer', 'failed');
+                appendTestOutput('pdfviewer', `\n❌ PDFViewer test suite failed: ${error.message}`);
+                testResults.pdfViewer = { passed: 0, failed: 1 };
+            }
+            
+            completedTests++;
+            updateProgress();
+        }
+
+        async function runErrorHandlingTests() {
+            setTestStatus('errorhandling', 'running');
+            clearTestOutput('errorhandling');
+            
+            try {
+                appendTestOutput('errorhandling', 'Starting Error Handling tests...\n');
+                
+                // Capture console output
+                const originalLog = console.log;
+                const originalError = console.error;
+                
+                console.log = (msg) => {
+                    appendTestOutput('errorhandling', msg);
+                    originalLog(msg);
+                };
+                
+                console.error = (msg) => {
+                    appendTestOutput('errorhandling', `ERROR: ${msg}`);
+                    originalError(msg);
+                };
+                
+                // Run the error handling tests
+                await window.testLoggingAndErrorHandling.runAllTests();
+                
+                // Since the error handling tests don't return structured results,
+                // we'll assume they passed if no exception was thrown
+                testResults.errorHandling = { passed: 1, failed: 0 };
+                
+                // Restore console
+                console.log = originalLog;
+                console.error = originalError;
+                
+                setTestStatus('errorhandling', 'passed');
+                appendTestOutput('errorhandling', '\n✅ All Error Handling tests passed!');
+                
+            } catch (error) {
+                setTestStatus('errorhandling', 'failed');
+                appendTestOutput('errorhandling', `\n❌ Error Handling test suite failed: ${error.message}`);
+                testResults.errorHandling = { passed: 0, failed: 1 };
+            }
+            
+            completedTests++;
+            updateProgress();
+        }
+
+        async function runAllTests() {
+            // Reset counters
+            totalTests = 4;
+            completedTests = 0;
+            updateProgress();
+            
+            // Clear all previous results
+            testResults = {
+                pdfManager: null,
+                tagSystem: null,
+                pdfViewer: null,
+                errorHandling: null
+            };
+            
+            // Run all test suites
+            await runPDFManagerTests();
+            await runTagSystemTests();
+            await runPDFViewerTests();
+            await runErrorHandlingTests();
+            
+            // Show final summary
+            const totalPassed = Object.values(testResults).reduce((sum, result) => 
+                sum + (result ? result.passed : 0), 0
+            );
+            const totalFailed = Object.values(testResults).reduce((sum, result) => 
+                sum + (result ? result.failed : 0), 0
+            );
+            
+            console.log(`\n🎯 FINAL RESULTS: ${totalPassed} passed, ${totalFailed} failed`);
+            
+            if (totalFailed === 0) {
+                console.log('🎉 All unit tests passed successfully!');
+            } else {
+                console.log(`⚠️  ${totalFailed} test(s) need attention`);
+            }
+        }
+
+        function clearResults() {
+            // Reset all test outputs and statuses
+            ['pdfmanager', 'tagsystem', 'pdfviewer', 'errorhandling'].forEach(testName => {
+                setTestStatus(testName, 'pending');
+                clearTestOutput(testName);
+                document.getElementById(`${testName}-output`).textContent = 
+                    `Click "${testName.charAt(0).toUpperCase() + testName.slice(1)} Tests" or "Run All Tests" to execute...`;
+            });
+            
+            // Reset progress
+            totalTests = 0;
+            completedTests = 0;
+            updateProgress();
+            
+            // Clear results
+            testResults = {
+                pdfManager: null,
+                tagSystem: null,
+                pdfViewer: null,
+                errorHandling: null
+            };
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

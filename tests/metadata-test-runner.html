@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Metadata System Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.running {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .status.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Metadata System Tests</h1>
+        
+        <p>This page tests the PDF metadata system functionality including:</p>
+        <ul>
+            <li>Loading metadata from JSON files</li>
+            <li>Generating default metadata for files without metadata</li>
+            <li>Validating and normalizing metadata</li>
+            <li>Caching metadata for performance</li>
+            <li>Error handling for invalid metadata</li>
+        </ul>
+        
+        <button id="runTests" onclick="runTests()">Run Tests</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div id="output" class="test-output" style="display: none;"></div>
+    </div>
+
+    <!-- Include required JavaScript files -->
+    <script src="../js/main.js"></script>
+    <script src="../js/pdf-manager.js"></script>
+    <script src="metadata-system.test.js"></script>
+
+    <script>
+        let originalConsole = {};
+        let testOutput = '';
+
+        function runTests() {
+            const button = document.getElementById('runTests');
+            const status = document.getElementById('status');
+            const output = document.getElementById('output');
+            
+            // Disable button and show running status
+            button.disabled = true;
+            status.className = 'status running';
+            status.style.display = 'block';
+            status.textContent = 'Running tests...';
+            
+            // Clear previous output
+            testOutput = '';
+            output.style.display = 'block';
+            output.textContent = '';
+            
+            // Capture console output
+            captureConsoleOutput();
+            
+            // Run tests
+            setTimeout(async () => {
+                try {
+                    const tests = new MetadataSystemTests();
+                    await tests.runAllTests();
+                    
+                    status.className = 'status success';
+                    status.textContent = 'Tests completed successfully!';
+                } catch (error) {
+                    status.className = 'status error';
+                    status.textContent = `Tests failed: ${error.message}`;
+                    console.error('Test execution error:', error);
+                } finally {
+                    // Restore console and update output
+                    restoreConsoleOutput();
+                    output.textContent = testOutput;
+                    button.disabled = false;
+                }
+            }, 100);
+        }
+
+        function captureConsoleOutput() {
+            originalConsole = {
+                log: console.log,
+                error: console.error,
+                debug: console.debug
+            };
+            
+            console.log = (...args) => {
+                testOutput += args.join(' ') + '\n';
+                originalConsole.log(...args);
+            };
+            
+            console.error = (...args) => {
+                testOutput += 'ERROR: ' + args.join(' ') + '\n';
+                originalConsole.error(...args);
+            };
+            
+            console.debug = (...args) => {
+                testOutput += 'DEBUG: ' + args.join(' ') + '\n';
+                originalConsole.debug(...args);
+            };
+        }
+
+        function restoreConsoleOutput() {
+            console.log = originalConsole.log;
+            console.error = originalConsole.error;
+            console.debug = originalConsole.debug;
+        }
+
+        // Auto-run tests on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Small delay to ensure all scripts are loaded
+            setTimeout(() => {
+                runTests();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

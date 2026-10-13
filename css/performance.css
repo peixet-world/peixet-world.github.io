@@ -1,0 +1,422 @@
+/* Performance optimization styles */
+
+/* Loading indicators */
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.loading-spinner .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-progress .progress-bar {
+    width: 200px;
+    height: 8px;
+    background-color: #f3f3f3;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.loading-progress .progress-fill {
+    height: 100%;
+    background-color: #3498db;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.loading-text {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Skeleton loading */
+.loading-skeleton .skeleton-content {
+    width: 100%;
+    max-width: 300px;
+}
+
+.skeleton-line {
+    height: 16px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 20px;
+    width: 80%;
+}
+
+.skeleton-text {
+    width: 100%;
+}
+
+.skeleton-text.short {
+    width: 60%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Loading placeholders for PDF cards */
+.loading-placeholder {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e1e8ed;
+}
+
+.placeholder-content {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.placeholder-title {
+    height: 24px;
+    background-color: #e1e8ed;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    width: 80%;
+}
+
+.placeholder-text {
+    height: 16px;
+    background-color: #e1e8ed;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.placeholder-text:nth-child(2) {
+    width: 100%;
+}
+
+.placeholder-text:nth-child(3) {
+    width: 70%;
+}
+
+.placeholder-actions {
+    height: 36px;
+    background-color: #e1e8ed;
+    border-radius: 6px;
+    margin-top: 1rem;
+    width: 60%;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Lazy loading states */
+.lazy-load {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.lazy-loaded {
+    opacity: 1;
+}
+
+.lazy-load-error {
+    opacity: 1;
+}
+
+.card-load-error {
+    text-align: center;
+    padding: 2rem;
+    color: #e74c3c;
+    background-color: #fdf2f2;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+}
+
+.card-load-error p {
+    margin-bottom: 1rem;
+}
+
+.retry-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.retry-btn:hover,
+.retry-btn:focus {
+    background-color: #2980b9;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* PDF thumbnail styles */
+.pdf-thumbnail {
+    width: 100%;
+    height: 200px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e1e8ed;
+}
+
+.pdf-thumbnail-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.thumbnail-loading,
+.thumbnail-placeholder,
+.thumbnail-error {
+    color: #666;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+.thumbnail-error {
+    color: #e74c3c;
+}
+
+.thumbnail-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.thumbnail-loading::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Performance optimized images */
+img[loading="lazy"] {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+img[loading="lazy"].loaded {
+    opacity: 1;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .spinner,
+    .skeleton-line,
+    .placeholder-content {
+        animation: none;
+    }
+    
+    .lazy-load,
+    .lazy-loaded,
+    img[loading="lazy"] {
+        transition: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .loading-indicator {
+        border: 2px solid currentColor;
+        background-color: Canvas;
+        color: CanvasText;
+    }
+    
+    .spinner {
+        border-color: CanvasText;
+        border-top-color: Highlight;
+    }
+    
+    .progress-bar {
+        border: 1px solid CanvasText;
+        background-color: Canvas;
+    }
+    
+    .progress-fill {
+        background-color: Highlight;
+    }
+    
+    .skeleton-line {
+        background: CanvasText;
+        opacity: 0.3;
+    }
+}
+
+/* Focus indicators for loading elements */
+.loading-indicator:focus-within {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .loading-indicator {
+        padding: 1rem;
+    }
+    
+    .loading-spinner .spinner {
+        width: 32px;
+        height: 32px;
+        border-width: 3px;
+    }
+    
+    .loading-progress .progress-bar {
+        width: 150px;
+        height: 6px;
+    }
+    
+    .pdf-thumbnail {
+        height: 150px;
+    }
+    
+    .loading-placeholder {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .loading-indicator {
+        padding: 0.75rem;
+    }
+    
+    .loading-spinner .spinner {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .loading-progress .progress-bar {
+        width: 120px;
+    }
+    
+    .pdf-thumbnail {
+        height: 120px;
+    }
+    
+    .skeleton-line {
+        height: 14px;
+    }
+    
+    .skeleton-title {
+        height: 18px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .loading-indicator,
+    .loading-placeholder,
+    .card-load-error {
+        display: none;
+    }
+}
+
+/* Performance hints for browsers */
+.pdf-card {
+    contain: layout style paint;
+}
+
+.pdf-thumbnail {
+    contain: layout style paint;
+}
+
+.loading-indicator {
+    contain: layout style paint;
+}
+
+/* Optimize for GPU acceleration */
+.spinner,
+.progress-fill,
+.skeleton-line {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+}
+
+/* Intersection observer fallback styles */
+.no-intersection-observer .lazy-load {
+    opacity: 1;
+}
+
+/* Cache status indicator (for debugging) */
+.cache-status {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    z-index: 1000;
+    display: none;
+}
+
+.cache-status.visible {
+    display: block;
+}
+
+/* Preload hints */
+link[rel="preload"] {
+    /* Ensure preloaded resources are prioritized */
+    importance: high;
+}
+
+/* Critical resource loading */
+.critical-css {
+    /* Inline critical CSS to prevent render blocking */
+    display: inline;
+}
+
+/* Lazy loading container optimization */
+.lazy-container {
+    min-height: 200px; /* Prevent layout shift */
+    position: relative;
+}
+
+.lazy-container.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
