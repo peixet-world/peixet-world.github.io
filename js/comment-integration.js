@@ -159,18 +159,20 @@ class CommentIntegration {
             
             // Show loading state
             this.showLoadingState(container, 'Loading comments...');
-
-            // Load Giscus script
+            
+            // The target div must be in the DOM before client.js executes:
+            // giscus injects the iframe into the first .giscus div present at
+            // that moment, otherwise it falls back to inserting one directly
+            // after the (head-appended) script tag, where it renders nowhere
+            this.clearContainer(container);
+            const giscusDiv = document.createElement('div');
+            giscusDiv.className = 'giscus';
+            container.appendChild(giscusDiv);
+            
+            // Load Giscus script; client.js then fills our div with the iframe
             const success = await this.loadGiscusScript();
             
             if (success) {
-                // Clear container and create Giscus container
-                this.clearContainer(container);
-                
-                const giscusDiv = document.createElement('div');
-                giscusDiv.className = 'giscus';
-                container.appendChild(giscusDiv);
-                
                 Logger.info('CommentIntegration: Giscus widget setup completed');
                 return true;
             } else {
