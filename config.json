@@ -23,7 +23,7 @@
     "reactionsEnabled": "1",
     "emitMetadata": "0",
     "inputPosition": "bottom",
-    "theme": "light",
+    "theme": "https://giscus.catppuccin.com/themes/mocha-lavender-no-loader.css",
     "lang": "en"
   }
 }

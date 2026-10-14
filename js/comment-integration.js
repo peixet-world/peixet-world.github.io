@@ -14,7 +14,7 @@ class CommentIntegration {
             reactionsEnabled: '1',
             emitMetadata: '0',
             inputPosition: 'bottom',
-            theme: 'light',
+            theme: repoConfig.theme || 'light',
             lang: 'en'
         };
         

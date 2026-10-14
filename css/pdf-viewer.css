@@ -4,19 +4,19 @@
     display: flex;
     flex-direction: column;
     min-height: calc(100vh - 60px); /* Account for header */
-    background-color: #2f3640;
-    color: white;
+    background-color: var(--color-bg-base);
+    color: var(--color-text);
 }
 
 .pdf-controls {
-    background-color: #353b48;
+    background-color: var(--color-surface);
     padding: 1rem;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
     align-items: center;
-    color: white;
-    border-bottom: 1px solid #40485a;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -29,12 +29,12 @@
     justify-content: center;
     align-items: flex-start;
     padding: 1rem;
-    background-color: #2f3640;
+    background-color: var(--color-bg-base);
 }
 
 #pdf-canvas {
-    border: 1px solid #40485a;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 12px var(--shadow-color-strong);
     background-color: white;
     max-width: 100%;
     height: auto;
@@ -48,8 +48,8 @@
 }
 
 .control-btn {
-    background-color: #3742fa;
-    color: white;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -63,17 +63,18 @@
 }
 
 .control-btn:hover:not(:disabled) {
-    background-color: #2f32ca;
+    background-color: var(--color-accent-hover);
     transform: translateY(-1px);
 }
 
 .control-btn:focus {
-    outline: 2px solid #ffd700;
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
 }
 
 .control-btn:disabled {
-    background-color: #6c757d;
+    background-color: var(--color-surface-3);
+    color: var(--color-text-muted);
     cursor: not-allowed;
     opacity: 0.6;
 }
@@ -92,18 +93,18 @@
 #page-input {
     width: 60px;
     padding: 0.5rem;
-    border: 1px solid #40485a;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    background-color: #40485a;
-    color: white;
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
     text-align: center;
     font-size: 0.9rem;
 }
 
 #page-input:focus {
-    outline: 2px solid #3742fa;
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
-    background-color: #4a5568;
+    background-color: var(--color-surface-3);
 }
 
 #zoom-level {
@@ -126,8 +127,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
+    background-color: var(--color-overlay-scrim);
+    color: var(--color-text);
     padding: 2rem;
     border-radius: 8px;
     text-align: center;
@@ -144,8 +145,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #dc3545;
-    color: white;
+    background-color: var(--color-danger);
+    color: var(--color-on-accent);
     padding: 2rem;
     border-radius: 8px;
     text-align: center;
@@ -160,20 +161,20 @@
 
 /* Comments section styling */
 .comments-section {
-    background-color: #353b48;
-    border-top: 1px solid #40485a;
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
     padding: 2rem;
     margin-top: auto;
 }
 
 .comments-section h2 {
-    color: white;
+    color: var(--color-text);
     margin-bottom: 1rem;
     font-size: 1.5rem;
 }
 
 #comments-container {
-    background-color: #40485a;
+    background-color: var(--color-surface-2);
     border-radius: 8px;
     padding: 1rem;
     min-height: 200px;
@@ -182,7 +183,7 @@
 /* Comment fallback styling */
 .comment-fallback {
     text-align: center;
-    color: #e1e5e9;
+    color: var(--color-text);
     padding: 2rem;
 }
 
@@ -202,26 +203,26 @@
 }
 
 .comment-fallback a {
-    color: #3742fa;
+    color: var(--color-accent);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .comment-fallback a:hover {
-    color: #2f32ca;
+    color: var(--color-accent-hover);
     text-decoration: underline;
 }
 
 .comment-fallback a:focus {
-    outline: 2px solid #ffd700;
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
 }
 
 /* Giscus loading state */
 .giscus-loading {
     text-align: center;
-    color: #e1e5e9;
+    color: var(--color-text);
     padding: 2rem;
     font-style: italic;
 }
@@ -234,7 +235,7 @@
 /* Override Giscus theme to match dark viewer */
 .giscus-frame {
     border-radius: 8px;
-    border: 1px solid #40485a;
+    border: 1px solid var(--color-border);
 }
 
 /* Responsive design for mobile */

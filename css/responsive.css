@@ -260,12 +260,12 @@
 /* Focus styles for better accessibility */
 @media (prefers-reduced-motion: no-preference) {
     :focus {
-        outline: 2px solid #3498db;
+        outline: 2px solid var(--color-focus);
         outline-offset: 2px;
     }
     
     .pdf-card:focus-within {
-        outline: 2px solid #3498db;
+        outline: 2px solid var(--color-focus);
         outline-offset: 2px;
     }
 }

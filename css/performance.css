@@ -13,8 +13,8 @@
 .loading-spinner .spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
+    border: 4px solid var(--color-surface-2);
+    border-top: 4px solid var(--color-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
@@ -28,7 +28,7 @@
 .loading-progress .progress-bar {
     width: 200px;
     height: 8px;
-    background-color: #f3f3f3;
+    background-color: var(--color-surface-2);
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 1rem;
@@ -36,14 +36,14 @@
 
 .loading-progress .progress-fill {
     height: 100%;
-    background-color: #3498db;
+    background-color: var(--color-accent);
     border-radius: 4px;
     transition: width 0.3s ease;
     width: 0%;
 }
 
 .loading-text {
-    color: #666;
+    color: var(--color-text-muted);
     font-size: 0.9rem;
 }
 
@@ -55,7 +55,7 @@
 
 .skeleton-line {
     height: 16px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%);
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s infinite;
     border-radius: 4px;
@@ -87,9 +87,9 @@
 /* Loading placeholders for PDF cards */
 .loading-placeholder {
     padding: 1.5rem;
-    background: white;
+    background: var(--color-surface);
     border-radius: 12px;
-    border: 1px solid #e1e8ed;
+    border: 1px solid var(--color-border);
 }
 
 .placeholder-content {
@@ -98,7 +98,7 @@
 
 .placeholder-title {
     height: 24px;
-    background-color: #e1e8ed;
+    background-color: var(--color-surface-2);
     border-radius: 4px;
     margin-bottom: 1rem;
     width: 80%;
@@ -106,7 +106,7 @@
 
 .placeholder-text {
     height: 16px;
-    background-color: #e1e8ed;
+    background-color: var(--color-surface-2);
     border-radius: 4px;
     margin-bottom: 0.5rem;
 }
@@ -121,7 +121,7 @@
 
 .placeholder-actions {
     height: 36px;
-    background-color: #e1e8ed;
+    background-color: var(--color-surface-2);
     border-radius: 6px;
     margin-top: 1rem;
     width: 60%;
@@ -153,10 +153,10 @@
 .card-load-error {
     text-align: center;
     padding: 2rem;
-    color: #e74c3c;
-    background-color: #fdf2f2;
+    color: var(--color-danger);
+    background-color: var(--color-danger-bg);
     border-radius: 8px;
-    border: 1px solid #f5c6cb;
+    border: 1px solid color-mix(in srgb, var(--color-danger) 45%, var(--color-bg-base));
 }
 
 .card-load-error p {
@@ -164,8 +164,8 @@
 }
 
 .retry-btn {
-    background-color: #3498db;
-    color: white;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -176,8 +176,8 @@
 
 .retry-btn:hover,
 .retry-btn:focus {
-    background-color: #2980b9;
-    outline: 2px solid #fff;
+    background-color: var(--color-accent-hover);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
 }
 
@@ -185,14 +185,14 @@
 .pdf-thumbnail {
     width: 100%;
     height: 200px;
-    background-color: #f8f9fa;
+    background-color: var(--color-surface-2);
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #e1e8ed;
+    border: 1px solid var(--color-border);
 }
 
 .pdf-thumbnail-image {
@@ -205,14 +205,14 @@
 .thumbnail-loading,
 .thumbnail-placeholder,
 .thumbnail-error {
-    color: #666;
+    color: var(--color-text-muted);
     font-size: 0.9rem;
     text-align: center;
     padding: 1rem;
 }
 
 .thumbnail-error {
-    color: #e74c3c;
+    color: var(--color-danger);
 }
 
 .thumbnail-loading {
@@ -226,8 +226,8 @@
     content: '';
     width: 24px;
     height: 24px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #3498db;
+    border: 2px solid var(--color-surface-2);
+    border-top: 2px solid var(--color-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -287,7 +287,7 @@ img[loading="lazy"].loaded {
 
 /* Focus indicators for loading elements */
 .loading-indicator:focus-within {
-    outline: 2px solid #3498db;
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
 }
 
@@ -384,8 +384,8 @@ img[loading="lazy"].loaded {
     position: fixed;
     bottom: 10px;
     right: 10px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
+    background: var(--color-overlay-scrim);
+    color: var(--color-text);
     padding: 0.5rem;
     border-radius: 4px;
     font-size: 0.8rem;
@@ -416,7 +416,7 @@ link[rel="preload"] {
 }
 
 .lazy-container.loading {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%);
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s infinite;
 }
