@@ -16,6 +16,10 @@
    ========================================================================== */
 
 :root {
+    /* Claim native UI (scrollbars, form controls, overscroll) for dark mode */
+    color-scheme: dark;
+    scrollbar-color: var(--color-surface-3) var(--color-bg-base);
+
     /* ----- Catppuccin Mocha ----- */
     --ctp-mocha-rosewater: #f5e0dc;
     --ctp-mocha-flamingo: #f2cdcd;
