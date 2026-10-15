@@ -289,6 +289,16 @@ class PDFManager {
                 metadata = await this.generateDefaultMetadata(filename);
             }
             
+            const manifestEntry = this.getPDFByFilename(filename);
+            if (manifestEntry) {
+                if (manifestEntry.uploadDate) {
+                    metadata.uploadDate = manifestEntry.uploadDate;
+                }
+                if (manifestEntry.fileSize) {
+                    metadata.fileSize = manifestEntry.fileSize;
+                }
+            }
+
             // Cache the metadata
             this.metadataCache.set(baseFilename, metadata);
             Logger.debug('Metadata cached', { filename: baseFilename });
