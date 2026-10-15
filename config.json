@@ -2,10 +2,10 @@
   "site": {
     "title": "PDF Library",
     "description": "Personal PDF sharing website",
-    "owner": "Pollastre Software"
+    "owner": "Peixet World"
   },
   "github": {
-    "repo": "pollastre-software/pollastre-software.github.io",
+    "repo": "peixet-world/peixet-world.github.io",
     "branch": "main"
   },
   "features": {
@@ -14,10 +14,10 @@
     "search": true
   },
   "giscus": {
-    "repo": "pollastre-software/pollastre-software.github.io",
-    "repoId": "R_kgDOVILoBw",
+    "repo": "peixet-world/peixet-world.github.io",
+    "repoId": "R_kgDOVLXcOw",
     "category": "General",
-    "categoryId": "DIC_kwDOVILoB84DIWFA",
+    "categoryId": "DIC_kwDOVLXcO84DIigK",
     "mapping": "pathname",
     "strict": "0",
     "reactionsEnabled": "1",
