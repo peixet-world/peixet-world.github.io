@@ -33,7 +33,7 @@ If you want to use a custom domain:
 The GitHub Actions workflow (`.github/workflows/deploy.yml`) handles:
 
 - **Validation** on pushes and pull requests (JavaScript syntax check, metadata validation)
-- **Manifest generation** via `scripts/build-site.py` (`pdfs/metadata/manifest.json` plus the repository name in `config.json`)
+- **Manifest validation** via `scripts/build-site.py --check` (the committed `pdfs/metadata/manifest.json` is deployed as-is)
 - **Artifact upload** and deployment to GitHub Pages (skipped for pull requests)
 - **Proper permissions** for GitHub Pages deployment
 
@@ -47,7 +47,7 @@ The following files are essential for GitHub Pages deployment:
 ```
 /
 ├── .github/workflows/deploy.yml  # GitHub Actions workflow
-├── scripts/build-site.py         # Generates the manifest at build time
+├── scripts/build-site.py         # Regenerates/validates the manifest
 ├── index.html                    # Homepage (entry point)
 ├── directory.html                # Directory listing page
 ├── viewer.html                   # PDF viewer page

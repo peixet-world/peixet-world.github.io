@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
-"""Build-time site preparation.
+"""Site content validation and manifest regeneration.
 
 1. Regenerates pdfs/metadata/manifest.json from the PDFs that actually exist
    in pdfs/, merging their optional metadata files from pdfs/metadata/<name>.json.
-2. Injects environment-specific values into config.json:
-   - GITHUB_REPOSITORY (provided by Actions) -> github.repo, giscus.repo, site.owner
-   - GISCUS_REPO_ID / GISCUS_CATEGORY_ID (repository variables) -> giscus.repoId / giscus.categoryId
+2. Validates config.json is well-formed.
 
-Runs in CI on every deploy, and locally for previews:
+Runs locally whenever PDFs change; CI runs --check to verify the committed
+manifest is in sync before deploying the repository as-is:
 
-    python3 scripts/build-site.py           # validate + write
-    python3 scripts/build-site.py --check   # validate only, write nothing
+    python3 scripts/build-site.py           # validate + write manifest.json
+    python3 scripts/build-site.py --check  # validate + verify committed manifest is current
 
-The committed manifest is a convenience for local previews; the CI output is
-authoritative.
+The committed pdfs/metadata/manifest.json is the source of truth for the
+deployed site - regenerate and commit it whenever PDFs are added or removed.
 """
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -183,7 +181,20 @@ def build_manifest(check_only):
     if not entries:
         warn("no PDF files found in pdfs/ - the site will show an empty library")
 
-    if not check_only:
+    if check_only:
+        committed = load_json(MANIFEST_PATH, "committed manifest")
+        if committed is not None:
+            def comparable(data):
+                snapshot = dict(data)
+                snapshot.pop("lastUpdated", None)
+                return snapshot
+
+            if comparable(committed) != comparable(manifest):
+                error(
+                    "pdfs/metadata/manifest.json is out of date - run "
+                    "`python3 scripts/build-site.py` and commit the result"
+                )
+    else:
         with MANIFEST_PATH.open("w", encoding="utf-8") as handle:
             json.dump(manifest, handle, indent=2, ensure_ascii=False)
             handle.write("\n")
@@ -191,32 +202,8 @@ def build_manifest(check_only):
     return manifest
 
 
-def inject_config(check_only):
-    config = load_json(CONFIG_PATH, "config.json")
-    if config is None:
-        return None, []
-
-    changes = []
-
-    repository = os.environ.get("GITHUB_REPOSITORY", "").strip()
-    if repository:
-        config.setdefault("github", {})["repo"] = repository
-        config.setdefault("site", {})["owner"] = repository.split("/")[0]
-        config.setdefault("giscus", {})["repo"] = repository
-        changes.append("github.repo/giscus.repo -> %s" % repository)
-
-    for variable, key in (("GISCUS_REPO_ID", "repoId"), ("GISCUS_CATEGORY_ID", "categoryId")):
-        value = os.environ.get(variable, "").strip()
-        if value:
-            config.setdefault("giscus", {})[key] = value
-            changes.append("giscus.%s -> %s" % (key, value))
-
-    if changes and not check_only:
-        with CONFIG_PATH.open("w", encoding="utf-8") as handle:
-            json.dump(config, handle, indent=2, ensure_ascii=False)
-            handle.write("\n")
-
-    return config, changes
+def validate_config():
+    return load_json(CONFIG_PATH, "config.json")
 
 
 def main():
@@ -224,11 +211,11 @@ def main():
     parser.add_argument(
         "--check",
         action="store_true",
-        help="validate content only; do not write manifest.json or config.json",
+        help="validate only; do not write manifest.json",
     )
     args = parser.parse_args()
 
-    config, config_changes = inject_config(args.check)
+    config = validate_config()
     manifest = build_manifest(args.check)
 
     for message in warnings:
@@ -240,12 +227,7 @@ def main():
         print("\nBuild failed with %d error(s)." % len(errors), file=sys.stderr)
         return 1
 
-    if config is None:
-        config_status = "missing"
-    elif config_changes:
-        config_status = "updated (%s)" % ", ".join(config_changes)
-    else:
-        config_status = "unchanged (no repository overrides in this environment)"
+    config_status = "valid" if config is not None else "missing"
 
     mode = "checked" if args.check else "written"
     print(

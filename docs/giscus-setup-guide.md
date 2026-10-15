@@ -87,19 +87,14 @@ Copy `data-repo-id` and `data-category-id`.
 
 ## Step 5: Store the Values
 
-The deploy workflow fills in `config.json` automatically:
+Edit `config.json` in the repository and commit the result:
 
-1. Go to **Settings → Secrets and variables → Variables → Repository variables**
-2. Add `GISCUS_REPO_ID` = the `data-repo-id` value
-3. Add `GISCUS_CATEGORY_ID` = the `data-category-id` value
+1. Set `giscus.repo` to `owner/repository`
+2. Set `giscus.repoId` to the `data-repo-id` value
+3. Set `giscus.categoryId` to the `data-category-id` value
 
-`github.repo` / `giscus.repo` are injected from `github.repository` on every build,
-so the repository name never has to be typed anywhere - it also stays correct if the
-repository is renamed or transferred.
-
-Values already present in `config.json` (`giscus.repoId`, `giscus.categoryId`) are
-kept as a fallback for local previews, but the repository variables always win in
-CI. Do not commit real IDs to `config.json` if you plan to template the repository.
+The committed `config.json` is the single source of truth - the deploy publishes
+the repository as-is, so the values take effect on the next push.
 
 ## Step 6: Test the Integration
 
@@ -110,9 +105,9 @@ CI. Do not commit real IDs to `config.json` if you plan to template the reposito
 
 ## Important Configuration Values
 
-- **repo**: `owner/repository` - injected automatically at build time
-- **repoId**: Unique identifier for your repository (get from giscus.app, store as `GISCUS_REPO_ID`)
-- **categoryId**: Unique identifier for the discussion category (get from giscus.app, store as `GISCUS_CATEGORY_ID`)
+- **repo**: `owner/repository` - set in `config.json`
+- **repoId**: Unique identifier for your repository (get from giscus.app, set as `giscus.repoId` in `config.json`)
+- **categoryId**: Unique identifier for the discussion category (get from giscus.app, set as `giscus.categoryId` in `config.json`)
 
 ## Troubleshooting
 
@@ -120,7 +115,7 @@ CI. Do not commit real IDs to `config.json` if you plan to template the reposito
 - Verify GitHub Discussions are enabled
 - Check that repository is public
 - Verify the Giscus app is installed (Step 2, or run the `curl` check)
-- Ensure the repository variables `GISCUS_REPO_ID` / `GISCUS_CATEGORY_ID` are set and
+- Ensure `giscus.repoId` / `giscus.categoryId` in `config.json` are set and
   do not still contain the example values (`R_kgDOExample123`, `DIC_kwDOExample456`) -
   the site treats placeholder values as "not configured"
 

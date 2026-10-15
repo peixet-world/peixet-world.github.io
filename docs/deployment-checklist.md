@@ -21,7 +21,7 @@ Use this checklist to ensure your PDF sharing website is properly configured and
 ### Configuration Files
 - [ ] `config.json` is configured with correct site information
 - [ ] `.github/workflows/deploy.yml` workflow file exists
-- [ ] `scripts/build-site.py` exists (regenerates the manifest on every deploy)
+- [ ] `scripts/build-site.py` exists (regenerate the manifest locally; CI verifies it is current)
 
 ## GitHub Pages Setup
 
@@ -97,7 +97,7 @@ Use this checklist to ensure your PDF sharing website is properly configured and
 ### Comment System (Giscus)
 - [ ] GitHub Discussions enabled in repository
 - [ ] Giscus GitHub App installed on the repository: https://github.com/apps/giscus
-- [ ] `GISCUS_REPO_ID` and `GISCUS_CATEGORY_ID` repository variables set (Settings → Secrets and variables → Variables)
+- [ ] `giscus.repoId` and `giscus.categoryId` set in `config.json` and committed
 - [ ] Comments display correctly on PDF viewer pages
 
 ### Custom Domain

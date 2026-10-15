@@ -17,10 +17,11 @@ A static website for sharing PDF documents, built with vanilla HTML, CSS, and Ja
 2. **Rename it** to `yourusername.github.io` (required for the default `https://yourusername.github.io` domain)
 3. **Enable GitHub Pages** in repository Settings → Pages → Source: GitHub Actions
 4. **Add your PDF files** to the `pdfs/` directory
-5. **Commit and push** - the manifest is rebuilt automatically and your site goes live at `https://yourusername.github.io`
+5. **Regenerate the manifest** (`python3 scripts/build-site.py`), commit everything and push - your site goes live at `https://yourusername.github.io`
 
-> The file listing (`pdfs/metadata/manifest.json`) is generated on every deploy by
-> `scripts/build-site.py` - you never edit it by hand.
+> The file listing (`pdfs/metadata/manifest.json`) is committed to the repository
+> and deployed as-is. Regenerate it with `scripts/build-site.py` whenever PDFs
+> change; CI fails if it is out of date.
 
 ## Detailed Setup Instructions
 
@@ -84,10 +85,11 @@ Metadata files are optional - PDFs without one still appear, with a title derive
 
 See [Metadata Schema Documentation](docs/metadata-schema.md) for complete field reference.
 
-> The site reads its file listing from `pdfs/metadata/manifest.json`. That file is
-> **generated automatically**: `scripts/build-site.py` runs on every deploy (and can be
-> run locally with `python3 scripts/build-site.py` to preview). Invalid metadata fails
-> the build with an error in the Actions log.
+> The site reads its file listing from `pdfs/metadata/manifest.json`, which is
+> committed to the repository. Run `python3 scripts/build-site.py` after adding or
+> removing PDFs and commit the result; CI verifies it is current and fails the
+> build otherwise. Invalid metadata also fails the build with an error in the
+> Actions log.
 
 ### 5. Comment System Setup (Optional)
 
@@ -96,7 +98,7 @@ Enable GitHub Discussions-based comments using Giscus:
 1. **Enable Discussions**: Repository Settings → General → Features → Discussions ✓
 2. **Install the Giscus app**: Visit [github.com/apps/giscus](https://github.com/apps/giscus) → Install → grant access to this repository (nothing in the repo can do this for you)
 3. **Get your IDs**: Visit [giscus.app](https://giscus.app/) and copy the generated `data-repo-id` and `data-category-id`
-4. **Store them as repository variables**: Settings → Secrets and variables → Variables → add `GISCUS_REPO_ID` and `GISCUS_CATEGORY_ID` (the build injects them into `config.json` automatically, together with the correct `owner/repository`)
+4. **Store them in `config.json`**: Set `giscus.repoId` and `giscus.categoryId` to the copied values (and `giscus.repo` to `owner/repository`), then commit
 
 The repository must be **public** for Giscus to work.
 
@@ -142,7 +144,7 @@ JavaScript files in the `js/` directory:
 ├── pdfs/                  # PDF storage directory
 │   └── metadata/          # Per-PDF metadata + generated manifest.json
 ├── scripts/
-│   └── build-site.py      # Generates the manifest, injects repository config
+│   └── build-site.py      # Regenerates/validates the manifest
 ├── assets/
 │   ├── icons/             # UI icons
 │   └── images/            # Website images
@@ -153,11 +155,11 @@ JavaScript files in the `js/` directory:
 
 ## Development
 
-The website is plain HTML, CSS and JavaScript with no page build step. The only build
-step is `scripts/build-site.py`, which GitHub Actions runs on every deploy to
-regenerate `pdfs/metadata/manifest.json` and fill in the repository name in
-`config.json`. Deployments run automatically on pushes to `main` (or `master`);
-pull requests run the same validation without deploying.
+The website is plain HTML, CSS and JavaScript with no page build step. The only
+build tool is `scripts/build-site.py`, which you run locally to regenerate
+`pdfs/metadata/manifest.json` (CI validates it with `--check` and deploys the
+committed files as-is). Deployments run automatically on pushes to `main` (or
+`master`); pull requests run the same validation without deploying.
 
 ### Local Development
 
@@ -212,8 +214,8 @@ npx serve .
 ```
 
 ### CI Testing
-Every push and pull request runs `python3 scripts/build-site.py` (validates all
-metadata and regenerates the manifest - invalid metadata fails the build) plus
+Every push and pull request runs `python3 scripts/build-site.py --check` (validates
+all metadata and verifies the committed manifest matches the PDFs in `pdfs/`) plus
 `node --check` on every JavaScript file. Pull requests validate only; they do not
 deploy.
 
@@ -232,7 +234,7 @@ the full list of runners).
 - ✅ Try hard refresh (Ctrl+F5 or Cmd+Shift+R)
 
 ### PDF Not Appearing in the List
-- ✅ The manifest is regenerated on deploy - check the Actions log for `Manifest written: N PDF(s)`
+- ✅ Regenerate the manifest locally (`python3 scripts/build-site.py`) and commit it - CI fails when it is stale
 - ✅ Confirm the file is committed (`git status` - untracked files never reach the site)
 - ✅ The PDF must sit directly in `pdfs/` (no subfolders) and end in `.pdf`
 
@@ -245,7 +247,7 @@ the full list of runners).
 
 ### Comments Not Working
 - ✅ Ensure GitHub Discussions are enabled in repository settings
-- ✅ Ensure `GISCUS_REPO_ID` and `GISCUS_CATEGORY_ID` repository variables are set (Settings → Secrets and variables → Variables)
+- ✅ Ensure `giscus.repo`, `giscus.repoId` and `giscus.categoryId` in `config.json` match your repository
 - ✅ Check that repository is public (required for Giscus)
 - ✅ Confirm the Giscus app is installed on the repository: https://github.com/apps/giscus
 - ✅ The workflow prints a non-blocking warning if Giscus is not installed
